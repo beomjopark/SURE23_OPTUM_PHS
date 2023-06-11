@@ -11,9 +11,8 @@ Where: Carneigie Mellon University
 When: June 1 - July 29 
 
 Why: Because Research that's why 
-```
+
 jk, because we have the potential to make real impact and improve the healthcare systems which will lead to better care for patients. 
-```
 
 How: not sure yet 
 
@@ -21,9 +20,10 @@ Data Sourcess: https://www.countyhealthrankings.org/explore-health-rankings/rank
 
 Technologies: Rstudio, tidyverse, dplyr, ...
 
-Contact: 
-```
+Contact:
+
 Hugo Baca
-email (hugo123baca@gmail)
-[LinkedIn]( www.linkedin.com/in/hugobaca).
-```
+
+[email] (hugo123baca@gmail)
+
+[LinkedIn]( www.linkedin.com/in/hugobaca)
