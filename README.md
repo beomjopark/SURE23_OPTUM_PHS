@@ -1,5 +1,5 @@
 #Carneigie Mellon Univeristy Research
-#HOSP
+
 ##HOSP = Hospital Outpatient Stay Prevention, Healthcare Optimization for Preventable Stays
 
 Who: Hugo Baca, Mgean, Andrea, Advisor Beonjo 
