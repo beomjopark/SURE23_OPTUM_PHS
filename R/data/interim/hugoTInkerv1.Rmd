@@ -1,0 +1,30 @@
+---
+title: "hugoTinkerv1"
+output: html_document
+date: "2023-06-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#
+```{r}
+library(tidyverse)
+head(data)
+```
+#list out name of each column 
+```{r}
+column_vars <- colnames(data)
+print(column_vars)
+```
+#exlcude anything in columnc vars that include 'premature'
+relevant_col <- co
+```{r}
+relevant_col <- colnames(data)[!grepl("premature", colnames(data), ignore.case = TRUE)]
+print(relevant_col)
+```
+#
+```{r}
+
+```
+
