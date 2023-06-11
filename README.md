@@ -24,6 +24,6 @@ Contact:
 
 Hugo Baca
 
-[email] (hugo123baca@gmail)
+[Email](hugo123baca@gmail)
 
 [LinkedIn]( www.linkedin.com/in/hugobaca)
