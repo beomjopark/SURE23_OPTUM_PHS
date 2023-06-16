@@ -9,7 +9,11 @@ date: "2023-06-09"
 ```{r}
 
 library(readr)
-trends <- read_csv("data/raw/chr_trends_csv_2023.csv")
+library(dplyr)
+library(ggplot2)
+
+trends <- read_csv("../data/raw/chr_trends_csv_2023.csv")
+data = read_csv("../data/raw/analytic_data2023_0.csv", skip = 1)
 View(trends)
 
 
@@ -17,16 +21,145 @@ View(trends)
 unemployment  = trends
 
 #1. create new var that looks at states and unemployment rates 
-unemployment  = trends
+
 #2. aggregate all the counties together within a year and each point = aggregation of all counties 
 
+test = unemployment %>% filter(measurename == "Unemployment rate") %>% 
+  group_by(state,yearspan) %>% 
+  summarize(mean_raw = mean(rawvalue))
+
+ggplot(test, aes(x = yearspan, y = mean_raw, color = state, group = state)) +
+   geom_line()+
+   geom_point()
 
 
 
 
 ```
+#NORTHEAST
+```{r}
+#NORTHEAST
+northeast = unemployment %>%  
+filter(measurename == "Unemployment rate", state %in% c("CT", "ME", "MA", "NH", "RI", "VT", "NJ", 'NY', 'PA')) %>% 
+group_by(state, yearspan) %>% 
+summarize(mean_raw = mean(rawvalue)) %>% 
+ggplot(aes(x = yearspan, y = mean_raw, color = state, group = state)) + 
+geom_line() +
+geom_point()
+  
+northeast
+
+
+#MIDWEST
+midwest = unemployment %>%  
+filter(measurename == "Unemployment rate", state %in% c("IL", "IN", "MI", "OH", "WI", "IA", "KS", 'MN', 'MO', 'NE','ND', 'SD')) %>% 
+group_by(state, yearspan) %>% 
+summarize(mean_raw = mean(rawvalue)) %>% 
+ggplot(aes(x = yearspan, y = mean_raw, color = state, group = state)) + 
+geom_line() +
+geom_point()
+
+midwest
+
+#SOUTH 
+south = unemployment %>%  
+filter(measurename == "Unemployment rate", state %in% c("DE", "FL", "GA", "MD", "NC", "SC", "VA", 'WV', 'MO', 'NE','ND', 'SD')) %>% 
+group_by(state, yearspan) %>% 
+summarize(mean_raw = mean(rawvalue)) %>% 
+ggplot(aes(x = yearspan, y = mean_raw, color = state, group = state)) + 
+geom_line() +
+geom_point()
+
+south
+
+
+#WEST
+west = unemployment %>%  
+filter(measurename == "Unemployment rate", state %in% c("AZ", "CO", "ID", "MT", "NV", "NM", "UT", 'WY')) %>% 
+group_by(state, yearspan) %>% 
+summarize(mean_raw = mean(rawvalue)) %>% 
+ggplot(aes(x = yearspan, y = mean_raw, color = state, group = state)) + 
+geom_line() +
+geom_point()
+
+
+
+#MAKE SURE ALL THE SCALES ARE THE SAME WHEN COMPARING ACROSS DIFF GRAPHS 
+
+
+
+```
+
+
+
+
+
 
 ```{r}
-#create a line graph that looks at different states and preventable hospital stays 
+#testing AK 
+
+test_state = 
+  unemployment %>% filter(measurename == "Unemployment rate", state %in% c("CO", "NY")) %>% 
+  group_by(state, yearspan) %>% 
+  summarize(mean_raw = mean(rawvalue)) 
+
+ggplot(test_state, aes(x = yearspan, y = mean_raw, color = state, group = state)) +
+   geom_line()+
+   geom_point()
+
+test_state
+#got rid of the color = state arguement 
+
+
+
+#test states
+AK =  unemployment %>% filter(measurename == "Unemployment rate", state == "AK") %>% 
+  group_by(state, yearspan) %>% 
+  summarize(mean_raw = mean(rawvalue)) 
+
+ggplot(AK, aes(x = yearspan, y = mean_raw, color = state, group =1)) +
+   geom_line()+
+   geom_point()
+
+
+CO =  unemployment %>% filter(measurename == "Unemployment rate", state == "CO") %>% 
+  group_by(state, yearspan) %>% 
+  summarize(mean_raw = mean(rawvalue)) 
+
+ggplot(CO, aes(x = yearspan, y = mean_raw, color = state, group =1)) +
+   geom_line()+
+   geom_point()
+
+
+NY =  unemployment %>% filter(measurename == "Unemployment rate", state == "NY") %>% 
+  group_by(state, yearspan) %>% 
+  summarize(mean_raw = mean(rawvalue)) 
+
+ggplot(NY, aes(x = yearspan, y = mean_raw, color = state, group =1)) +
+   geom_line()+
+   geom_point()
+```
+```{r}
+#HEAT MAP OVERLAY 
+install.packages("usmap")
+library(usmap)
+library(tidyverse)
+library(ggplot2)
+
+#SCATTERPLOT
+
+data_va = data %>% filter(`State Abbreviation` =="VA") %>% 
+  select(153:162, 193:197, 183:187, 218:222) %>% 
+  ggplot(aes(x = `Unemployment raw value`, y = `Preventable Hospital Stays (Asian/Pacific Islander)` )) + geom_point(alpha = 0.8 )
+View(data_va)
+
+data_va = data %>% filter(state =="VA") %>% 
+  select(153:162, 193:197, 183:187, 218:222)
+
+ggplot(data_va, aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.8 )
+
+ggplot(as.tibble(data_va),aes(x = `Unemployment raw value`, y = `Preventable Hospital Stays (Asian/Pacific Islander)` )) + geom_point(alpha = 0.8 )
+
+
 ```
 
