@@ -1,0 +1,262 @@
+
+R version 4.2.2 (2022-10-31 ucrt) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Workspace loaded from C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test/CMUxHOSP/.RData]
+
+Error in FUN(X[[i]], ...) : 
+  'CreateProcess' failed to run 'C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.10_3.10.3056.0_x64__qbz5n2kfra8p0\python.exe -c "import sys; print(sys.platform)"'
+Calls: do.call -> <Anonymous> -> <Anonymous> -> vapply -> FUN
+Execution halted
+> load("C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test/CMUxHOSP/.RData")
+> #create a line graph that looks at different states and unemployment rates
+> unemployment  = trends
+> 
+> #1. create new var that looks at states and unemployment rates 
+> unemployment  = trends
+> #2. aggregate all the counties together within a year and each point = aggregation of all counties 
+> 
+> 
+> 
+> head(employment)
+Error in head(employment) : object 'employment' not found
+> library(readr)
+Warning: package ‘readr’ was built under R version 4.2.3
+> library(dplyr)
+Warning: package ‘dplyr’ was built under R version 4.2.3
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> trends <- read_csv("data/raw/chr_trends_csv_2023.csv")
+Error: 'data/raw/chr_trends_csv_2023.csv' does not exist in current working directory ('C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test').
+> load("C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test/CMUxHOSP/.RData")
+> library(readr)
+> library(dplyr)
+> 
+> trends <- read_csv("data/raw/chr_trends_csv_2023.csv")
+Error: 'data/raw/chr_trends_csv_2023.csv' does not exist in current working directory ('C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test').
+> load("C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test/CMUxHOSP/.RData")
+> library(readr)
+> library(dplyr)
+> 
+> trends <- read_csv("data/raw/chr_trends_csv_2023.csv")
+Error: 'data/raw/chr_trends_csv_2023.csv' does not exist in current working directory ('C:/Users/megan/OneDrive/Desktop/3rd Year/Spring Semester 23/CMU Bridges to Healthcare Tech/test').
+> library(readr)
+> library(dplyr)
+>         
+> 
+> trends  = read_csv("C:/Users/megan/Downloads/chr_trends_csv_2023 (1).csv")
+Rows: 664109 Columns: 15── Column specification ────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): yearspan, measurename, statecode, countycode, county, state
+dbl (6): numerator, denominator, measureid, chrreleaseyear, differflag, trendbreak
+num (3): rawvalue, cilow, cihigh
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> View(trends)
+> 
+> 
+> #create a line graph that looks at different states and unemployment rates
+> unemployment  = trends
+> 
+> #1. create new var that looks at states and unemployment rates 
+> unemployment  = trends
+> head(employment)
+Error in head(employment) : object 'employment' not found
+> library(readr)
+> library(dplyr)
+>         
+> 
+> trends  = read_csv("C:/Users/megan/Downloads/chr_trends_csv_2023 (1).csv")
+Rows: 664109 Columns: 15── Column specification ──────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): yearspan, measurename, statecode, countycode, county, state
+dbl (6): numerator, denominator, measureid, chrreleaseyear, differflag, trendbreak
+num (3): rawvalue, cilow, cihigh
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> View(trends)
+> 
+> 
+> #create a line graph that looks at different states and unemployment rates
+> unemployment  = trends
+Error in exists(cacheKey, where = .rs.WorkingDataEnv, inherits = FALSE) : 
+  invalid first argument
+Error in assign(cacheKey, frame, .rs.CachedDataEnv) : 
+  attempt to use zero-length variable name
+> 
+> unemployment %>% filter(measurename = "Unemployment rate") %>% 
++   group_by(state,yearspan) %>% 
++   summarize(mean_raw = mean(rawvalue)) %>% 
++ ggplot(aes(x = yearspan, y = rawvalue, color = state)) +
++   geom_line()
+Error in ggplot(., aes(x = yearspan, y = rawvalue, color = state)) : 
+  could not find function "ggplot"
+> library(ggplot2)
+Warning: package ‘ggplot2’ was built under R version 4.2.3
+> library(readr)
+> library(dplyr)
+> library(ggplot2)
+>         
+> 
+> trends  = read_csv("C:/Users/megan/Downloads/chr_trends_csv_2023 (1).csv")
+Rows: 664109 Columns: 15── Column specification ──────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): yearspan, measurename, statecode, countycode, county, state
+dbl (6): numerator, denominator, measureid, chrreleaseyear, differflag, trendbreak
+num (3): rawvalue, cilow, cihigh
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> View(trends)
+> 
+> 
+> #create a line graph that looks at different states and unemployment rates
+> unemployment  = trends
+Error in exists(cacheKey, where = .rs.WorkingDataEnv, inherits = FALSE) : 
+  invalid first argument
+Error in assign(cacheKey, frame, .rs.CachedDataEnv) : 
+  attempt to use zero-length variable name
+> 
+> unemployment %>% filter(measurename = "Unemployment rate") %>% 
++   group_by(state,yearspan) %>% 
++   summarize(mean_raw = mean(rawvalue)) %>% 
++ ggplot(aes(x = yearspan, y = rawvalue, color = state)) +
++   geom_line()
+Error in `filter()`:
+! We detected a named input.
+ℹ This usually means that you've used `=` instead of `==`.
+ℹ Did you mean `measurename == "Unemployment rate"`?
+Backtrace:
+ 1. ... %>% ...
+ 6. dplyr:::filter.data.frame(., measurename = "Unemployment rate")
+> library(readr)
+> library(dplyr)
+> library(ggplot2)
+>         
+> 
+> trends  = read_csv("C:/Users/megan/Downloads/chr_trends_csv_2023 (1).csv")
+Rows: 664109 Columns: 15── Column specification ──────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): yearspan, measurename, statecode, countycode, county, state
+dbl (6): numerator, denominator, measureid, chrreleaseyear, differflag, trendbreak
+num (3): rawvalue, cilow, cihigh
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> View(trends)
+> 
+> 
+> #create a line graph that looks at different states and unemployment rates
+> unemployment  = trends
+Error in exists(cacheKey, where = .rs.WorkingDataEnv, inherits = FALSE) : 
+  invalid first argument
+Error in assign(cacheKey, frame, .rs.CachedDataEnv) : 
+  attempt to use zero-length variable name
+> 
+> unemployment %>% filter(measurename == "Unemployment rate") %>% 
++   group_by(state,yearspan) %>% 
++   summarize(mean_raw = mean(rawvalue)) %>% 
++ ggplot(aes(x = yearspan, y = rawvalue, color = state)) +
++   geom_line()
+`summarise()` has grouped output by 'state'. You can override using the `.groups` argument.Error in `geom_line()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error in `FUN()`:
+! object 'rawvalue' not found
+Backtrace:
+  1. base (local) `<fn>`(x)
+  2. ggplot2:::print.ggplot(x)
+  4. ggplot2:::ggplot_build.ggplot(x)
+  5. ggplot2:::by_layer(...)
+ 12. ggplot2 (local) f(l = layers[[i]], d = data[[i]])
+ 13. l$compute_aesthetics(d, plot)
+ 14. ggplot2 (local) compute_aesthetics(..., self = self)
+ 15. ggplot2:::scales_add_defaults(...)
+ 16. base::lapply(aesthetics[new_aesthetics], eval_tidy, data = data)
+ 17. rlang (local) FUN(X[[i]], ...)
+> test = unemployment %>% filter(measurename == "Unemployment rate") %>% 
++   group_by(state,yearspan) %>% 
++   summarize(mean_raw = mean(rawvalue))
+`summarise()` has grouped output by 'state'. You can override using the `.groups` argument.
+> test
+> ggplot(test, aes(x = yearspan, y = rawvalue, color = state)) +
++   geom_line()
+Error in `geom_line()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error in `FUN()`:
+! object 'rawvalue' not found
+Backtrace:
+  1. base (local) `<fn>`(x)
+  2. ggplot2:::print.ggplot(x)
+  4. ggplot2:::ggplot_build.ggplot(x)
+  5. ggplot2:::by_layer(...)
+ 12. ggplot2 (local) f(l = layers[[i]], d = data[[i]])
+ 13. l$compute_aesthetics(d, plot)
+ 14. ggplot2 (local) compute_aesthetics(..., self = self)
+ 15. ggplot2:::scales_add_defaults(...)
+ 16. base::lapply(aesthetics[new_aesthetics], eval_tidy, data = data)
+ 17. rlang (local) FUN(X[[i]], ...)
+> ggplot(test, aes(x = yearspan, y = rawvalue, color = state)) +
++   geom_line()+
++   geom_point()
+Error in `geom_line()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error in `FUN()`:
+! object 'rawvalue' not found
+Backtrace:
+  1. base (local) `<fn>`(x)
+  2. ggplot2:::print.ggplot(x)
+  4. ggplot2:::ggplot_build.ggplot(x)
+  5. ggplot2:::by_layer(...)
+ 12. ggplot2 (local) f(l = layers[[i]], d = data[[i]])
+ 13. l$compute_aesthetics(d, plot)
+ 14. ggplot2 (local) compute_aesthetics(..., self = self)
+ 15. ggplot2:::scales_add_defaults(...)
+ 16. base::lapply(aesthetics[new_aesthetics], eval_tidy, data = data)
+ 17. rlang (local) FUN(X[[i]], ...)
+> test
+# A tibble: 1,040 × 3
+# Groups:   state [52]
+   state yearspan mean_raw
+   <chr> <chr>       <dbl>
+ 1 AK    2002       0.0946
+ 2 AK    2003       0.0996
+ 3 AK    2004       0.0969
+ 4 AK    2005       0.0923
+ 5 AK    2006       0.0873
+ 6 AK    2007       0.0812
+ 7 AK    2008       0.0858
+ 8 AK    2009       0.0946
+ 9 AK    2010       0.102 
+10 AK    2011       0.104 
+# ℹ 1,030 more rows
+# ℹ Use `print(n = ...)` to see more rows
+> ggplot(test, aes(x = yearspan, y = mean_raw, color = state)) +
++   geom_line()+
++   geom_point()
+> ggplot(test, aes(x = yearspan, y = mean_raw, color = state, group =1)) +
++   geom_line()+
++   geom_point()
+> 

@@ -1,0 +1,32 @@
+---
+title: "Megan Preventable Hospitals"
+output: html_document
+date: "2023-06-09"
+---
+
+
+
+```{r}
+
+library(readr)
+trends <- read_csv("data/raw/chr_trends_csv_2023.csv")
+View(trends)
+
+
+#create a line graph that looks at different states and unemployment rates
+unemployment  = trends
+
+#1. create new var that looks at states and unemployment rates 
+unemployment  = trends
+#2. aggregate all the counties together within a year and each point = aggregation of all counties 
+
+
+
+
+
+```
+
+```{r}
+#create a line graph that looks at different states and preventable hospital stays 
+```
+
