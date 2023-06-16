@@ -104,13 +104,27 @@ abline(a=0, b=1, col="red")
 #attemtping heat map of virginia 
 ```{r}
 library(ggplot2)
-ggplot(data_interim_virginia, aes(x = va_counties, y =virginia_ps_asian , fill = Orange)) +
+library(dplyr)
+# replace 'var_fill' with the name of the variable you want to use for fill color
+ggplot(data_interim_virginia, aes(x = va_counties, y = virginia_ps_asian, fill = virginia_ps_asian)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "red") +
   theme_minimal() +
-  labs(x = "VA Counties", y = "Asian", fill = "Orange", 
+  labs(x = "VA Counties", y = "Asian", fill = "Preventable Stays", 
        title = "Heatmap of Virginia data") 
 ```
 
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Assuming 'var_fill' is the name of the column you want to use for fill color
+ggplot(data_interim_virginia, aes(x = va_counties, y = virginia_ps_asian, fill = var_fill)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme_minimal() +
+  labs(x = "VA Counties", y = "Asian", fill = "Preventable Stays", 
+       title = "Heatmap of Virginia data") 
+```
 
 
