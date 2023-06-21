@@ -20,6 +20,8 @@ Data Sources: https://www.countyhealthrankings.org/explore-health-rankings/ranki
 
 Technologies: Rstudio, tidyverse, dplyr, ...
 
+Desgin doc: https://docs.google.com/document/d/1BUZk0nItlUApkebYZxDXz6MqiVx2eeo00B0QYv6eW1U/edit?usp=sharing
+
 Contact:
 
 Hugo Baca
