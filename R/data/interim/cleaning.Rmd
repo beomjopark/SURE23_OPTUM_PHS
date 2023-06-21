@@ -1,0 +1,75 @@
+---
+title: "Cleaning"
+author: "Hugo Baca"
+date: "2023-06-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#analytics
+```{r}
+library(tidyverse)
+data <- read_csv("../../../data/raw/analytic_data2023_0.csv",
+                 skip=1)
+
+# Check if any of the column contains only the NA
+
+# Drop such columns
+
+isColAllNA = data %>% lapply(., function(x) all(is.na(x))) %>% unlist
+data %>% select(-c(1))
+which(isColAllNA)
+foo =which(isColAllNA)
+data %>% select(-all_of(foo))
+
+data$state %>% table(useNA="always")
+data$statecode %>% table(useNA="always")
+# Check if any of the column contains only the single value.
+
+# Document and drop the column
+single_value_cols <- apply(data, 2, function(x) length(unique(x)) == 1)
+print(single_value_cols)
+
+single_values =which(single_value_cols)
+data %>% select(-single_values)
+
+data_interim <-  data %>% select(-single_values)
+
+```
+
+#we are now analyzing trends
+```{r}
+#access trends data
+data_trends <- read_csv("../../../data/raw/chr_trends_csv_2023.csv")
+head(data_trends)
+
+#find col where all values = NA
+isColAllNA_trend = data_trends %>% lapply(., function(x) all(is.na(x))) %>% unlist
+print(isColAllNA_trend)
+
+#get 
+foo_trend = which(isColAllNA_trend)
+#remove col where all values = NA
+data_trends%>% select(-all_of(foo_trend))
+
+#finally, assign data to a var
+data_trends_interim <- data_trends
+
+#find cols containing only one the single value
+single_value_cols_trend <- apply(data_trends, 2, function(x) length(unique(x)) == 1)
+
+#get 
+single_value_trend <- which(single_value_cols_trend)
+
+print(single_value_cols_trend)
+
+print(single_value_trend)
+
+#remove cols that contain only one single value
+data_trends_interim <- data_trends %>% select(-single_value_trend)
+
+print(data_trends_interim)
+```

@@ -1,0 +1,39 @@
+---
+title: "hugoTinkerv1"
+output: html_document
+date: "2023-06-11"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#
+```{r}
+library(tidyverse)
+rawdata <- read_csv("/Users/hugobaca/Documents/GitHub/test/data/raw
+/analytic_data2023_0.csv")
+head(rawdata)
+```
+#list out name of each column 
+```{r}
+column_vars <- colnames(data)
+print(column_vars)
+```
+#exlcude anything in columnc vars that include 'premature'
+relevant_col <- co
+```{r}
+relevant_col <- colnames(data)[!grepl("premature", colnames(data), ignore.case = TRUE)]
+print(relevant_col)
+```
+#include only 'premature' prefix col names
+```{r}
+premature_vars <- colnames(data)[grepl("premature", colnames(data), ignore.case = False)]
+print(premature_vars)
+```
+
+```{r}
+test_var <- colnames(data)[grepl("premature", colnames(data), ignore.case = FALSE)]
+print(test_var)
+```
+
+
