@@ -2,7 +2,7 @@
 
 ## HOSP = Hospital Outpatient Stay Prevention, Healthcare Optimization for Preventable Stays
 
-Who: Hugo Baca, Mgean, Andrea, Advisor Beonjo 
+Who: Hugo Baca, Megan, Andrea, Advisor Beonjo 
 
 What: Optum & United Healthcare Group Research on Preventable Hospital Stays: Do income inequality, unemployment and high school completion rates affect the number of preventable hospital stays of certain racial groups at the county level?
 
