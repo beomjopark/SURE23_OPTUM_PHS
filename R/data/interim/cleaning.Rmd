@@ -12,31 +12,31 @@ knitr::opts_chunk$set(echo = TRUE)
 #analytics
 ```{r}
 library(tidyverse)
-data <- read_csv("../../../data/raw/analytic_data2023_0.csv",
-                 skip=1)
+data_analytic <- read_csv("../../../data/raw/analytic_data2023_0.csv",skip=1)
 
 # Check if any of the column contains only the NA
 
 # Drop such columns
 
-isColAllNA = data %>% lapply(., function(x) all(is.na(x))) %>% unlist
-data %>% select(-c(1))
+isColAllNA = data_analytic %>% lapply(., function(x) all(is.na(x))) %>% unlist
+data_analytic %>% select(-c(1))
 which(isColAllNA)
 foo =which(isColAllNA)
-data %>% select(-all_of(foo))
 
-data$state %>% table(useNA="always")
-data$statecode %>% table(useNA="always")
+data_analytic %>% select(-all_of(foo))
+
+data_analytic$state %>% table(useNA="always")
+data_analytic$statecode %>% table(useNA="always")
 # Check if any of the column contains only the single value.
 
 # Document and drop the column
-single_value_cols <- apply(data, 2, function(x) length(unique(x)) == 1)
+single_value_cols <- apply(data_analytic, 2, function(x) length(unique(x)) == 1)
 print(single_value_cols)
 
 single_values =which(single_value_cols)
-data %>% select(-single_values)
+data_analytic %>% select(-single_values)
 
-data_interim <-  data %>% select(-single_values)
+data_analytic_interim <-  data_analytic %>% select(-single_values)
 
 ```
 
@@ -79,19 +79,29 @@ print(data_trends_interim)
 #we will use the data in analytics
 ```{r}
 #grabeed all preventable stays within Queens County of New York
-> data_trends_interim %>% filter(state =='NY' & county == "Queens County" & measurename == "Preventable hospital stays")
+data_trends_interim %>% filter(state =='NY' & county == "Queens County" & measurename == "Preventable hospital stays")
 
 
-data_interim %>% filter(state =='NY' & county == "Queens County" & v044_rawvalue => 0)
+data_analytic_interim %>% filter(state =='NY' & county == "Queens County" & v044_rawvalue > 0)
 #v005_rawvalue - prevetbale stays 
 #v044_rawvalue - income inequality
-data_interim %>%
+data_analytic_interiminterim %>%
 #  filter(  v044_rawvalue > 0 & v005_rawvalue >0) %>%
   ggplot(aes(x = v005_rawvalue, y = v044_rawvalue)) +
-  geom_point(color=ifelse(data_interim$state=="NY", "red", "black"), alpha=0.2)
+  geom_point(color=ifelse(data_analytic_interim$state=="NY", "red", "blue"), alpha=0.3)
 
 
 #grab all inequality 
+
+```
+
+# California income inequality vs highschool completion
+```{r}
+data_analytic_interim %>%
+#  filter(  v044_rawvalue > 0 & v005_rawvalue >0) %>%
+  ggplot(aes(x = v005_rawvalue, y = v168_rawvalue)) +
+  geom_point(color=ifelse(data_analytic_interim$state=="CA", "red", "blue"), alpha=0.3)
+
 
 ```
 
