@@ -24,8 +24,15 @@ colnames(descriptions) = enc
 row.names(descriptions) = "description"
 saveRDS(descriptions, "../../../data/processed/colDesc_analysis2023.rds")
 
+length(desc)
+length(enc)
+
+new_desc <- tibble::tibble(code = enc, desc = desc)
+
 # Use case
 descriptions %>% select(starts_with("v005_rawvalue"))
+
+
 #                                   v005_rawvalue
 #description Preventable Hospital Stays raw value
 ```
@@ -33,12 +40,62 @@ descriptions %>% select(starts_with("v005_rawvalue"))
 ```{r}
 descriptions %>% select(starts_with("v005_rawvalue"))
 ```
+#read in the RDs
+```{r}
+readRDS('data/processed/colDesc_analysis2023.rds')
+```
 
 ##tried to use descriptions, almost but not quite 
 ```{r}
-ggplot(data_analytic_interim, aes(x = preventable_stays_col , y = income_inequality_col)) +
-  geom_point(color = ifelse(data_analytic_interim$state == "CA", "red", "blue"), alpha = 0.3) +
-  labs(x = "Preventable Hospital Stays raw value", y = "Income Inequality raw value") +
+plot_var_names = setNames(c("v044_rawvalue","v005_rawvalue"),
+                          c("x", "y"))
+
+ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_names["y"])) +
+  geom_point( alpha = 0.3) +
+  labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
   theme_minimal()
 ```
+#melt data 
+```{r}
+# reshape for unemployment variables 
+library(reshape2)
+library(reshape2)
+library(dplyr)
+data_income = data_analytic_interim[ , c("state","county","v005_race_asian","v005_race_black","v005_race_hispanic", "v005_race_white")]
+
+#melted data for unemployment
+ndimdf_preventable = melt(data_income, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+```
+#lets add race by color 
+```{r}
+plot_var_names = setNames(c("v044_rawvalue", "v005_race_black"),
+                          c("x", "y"))
+
+ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_names["y"])) +
+  geom_point( alpha = 0.3) +
+  labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
+  theme_minimal()
+```
+```{r}
+#plots for y axis by race
+
+#gather all y axis colnames - i.e. preventable hospital stays by race 
+#our x axis will be the same, income inequality v044_rawvalue
+plot_var_names_list <- data_analytic_interim %>% select(starts_with('v005_race')) %>% colnames
+
+# Loop over the list of variable names
+for (y_var in plot_var_names_list) {
+  # Generate the plot
+  p <- ggplot(data_analytic_interim, aes_string(x = "v044_rawvalue", y = y_var)) +
+    geom_point(alpha = 0.3) +
+    labs(x = descriptions[["v044_rawvalue"]], y = descriptions[[y_var]]) +
+    theme_minimal()
+  
+  # Print the plot
+  print(p)
+}
+
+```
+
+
 

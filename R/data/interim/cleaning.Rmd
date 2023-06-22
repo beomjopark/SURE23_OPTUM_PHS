@@ -119,7 +119,8 @@ row.names(descriptions) = "description"
 saveRDS(descriptions, "../../../data/processed/colDesc_analysis2023.rds")
 
 # Use case
-descriptions %>% select(starts_with("v005_rawvalue"))
+descriptions %>% select(starts_with("v005_rawvalue")) %>% tibble()
+ 
 #                                   v005_rawvalue
 #description Preventable Hospital Stays raw value
 ```
