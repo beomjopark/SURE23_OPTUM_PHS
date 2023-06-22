@@ -124,10 +124,5 @@ descriptions %>% select(starts_with("v005_rawvalue"))
 #description Preventable Hospital Stays raw value
 ```
 
-```{r}
-ggplot(data_analytic_interim, aes(x = preventable_stays_col , y = income_inequality_col)) +
-  geom_point(color = ifelse(data_analytic_interim$state == "CA", "red", "blue"), alpha = 0.3) +
-  labs(x = "Preventable Hospital Stays raw value", y = "Income Inequality raw value") +
-  theme_minimal()
-```
+
 
