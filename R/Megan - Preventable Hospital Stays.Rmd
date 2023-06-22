@@ -7,7 +7,6 @@ date: "2023-06-09"
 
 
 ```{r}
-
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -32,11 +31,9 @@ ggplot(test, aes(x = yearspan, y = mean_raw, color = state, group = state)) +
    geom_line()+
    geom_point()
 
-
-
-
 ```
-#NORTHEAST
+
+#MAPPING ALL THE REGIONS 
 ```{r}
 #NORTHEAST
 northeast = unemployment %>%  
@@ -82,11 +79,7 @@ ggplot(aes(x = yearspan, y = mean_raw, color = state, group = state)) +
 geom_line() +
 geom_point()
 
-
-
 #MAKE SURE ALL THE SCALES ARE THE SAME WHEN COMPARING ACROSS DIFF GRAPHS 
-
-
 
 ```
 
@@ -109,8 +102,6 @@ ggplot(test_state, aes(x = yearspan, y = mean_raw, color = state, group = state)
 
 test_state
 #got rid of the color = state arguement 
-
-
 
 #test states
 AK =  unemployment %>% filter(measurename == "Unemployment rate", state == "AK") %>% 
@@ -139,6 +130,10 @@ ggplot(NY, aes(x = yearspan, y = mean_raw, color = state, group =1)) +
    geom_line()+
    geom_point()
 ```
+   
+   
+   
+
 ```{r}
 #HEAT MAP OVERLAY 
 install.packages("usmap")
@@ -147,19 +142,80 @@ library(tidyverse)
 library(ggplot2)
 
 #SCATTERPLOT
-
-data_va = data %>% filter(`State Abbreviation` =="VA") %>% 
-  select(153:162, 193:197, 183:187, 218:222) %>% 
-  ggplot(aes(x = `Unemployment raw value`, y = `Preventable Hospital Stays (Asian/Pacific Islander)` )) + geom_point(alpha = 0.8 )
-View(data_va)
-
+#data_all = 
+#VIRGINIA
 data_va = data %>% filter(state =="VA") %>% 
   select(153:162, 193:197, 183:187, 218:222)
-
-ggplot(data_va, aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.8 )
-
-ggplot(as.tibble(data_va),aes(x = `Unemployment raw value`, y = `Preventable Hospital Stays (Asian/Pacific Islander)` )) + geom_point(alpha = 0.8 )
+ggplot(data_va, aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.8 )+ ggtitle("unemployment vs preventable stays for asians in va")
+#had to skip first line in order to get the headers (no longer need to use backticks to reference columns)
 
 
+#all 50 for asians
+data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222)
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians")
+
+
+#all 50 for black
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")
+
+
+#all 50 for hispanic
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")
+
+
+#all 50 for white
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")
+
+View(data_all)
+
+```
+
+
+
+```{r}
+# reshape for unemployment variables 
+library(reshape2)
+library(reshape2)
+library(dplyr)
+data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black"   , "v024_race_hispanic", "v024_race_white")]
+
+#melted data for unemployment
+ndimdf = melt(data_unemployment, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+```
+
+
+```{r}
+#chloropleth for unemployment
+
+library(maps)
+library(usdata)
+state_borders <- map_data("state")
+head(state_borders)
+
+state_unemployment = ndimdf %>%
+filter(!is.na(value), !state   %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_unemployment_rate = mean(value)) %>% 
+mutate(lower_state = abbr2state(state))
+  
+  
+state_unemployment_plot <- state_borders %>%
+left_join(state_unemployment,
+by = c("region" = "lower_state"))
+
+state_unemployment_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_unemployment_rate),
+color = "black") +
+scale_fill_gradient(
+low = "white"
+,
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg Unemployment Rate1") +
+theme(legend.position = "bottom")
 ```
 
