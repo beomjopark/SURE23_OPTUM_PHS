@@ -72,4 +72,26 @@ print(single_value_trend)
 data_trends_interim <- data_trends %>% select(-single_value_trend)
 
 print(data_trends_interim)
+#we have two data frames of cleaned up data 
 ```
+#let's do exploratory analsis
+#lets plot inequilty in the state of New York within queens county
+#we will use the data in analytics
+```{r}
+#grabeed all preventable stays within Queens County of New York
+> data_trends_interim %>% filter(state =='NY' & county == "Queens County" & measurename == "Preventable hospital stays")
+
+
+data_interim %>% filter(state =='NY' & county == "Queens County" & v044_rawvalue => 0)
+#v005_rawvalue - prevetbale stays 
+#v044_rawvalue - income inequality
+data_interim %>%
+#  filter(  v044_rawvalue > 0 & v005_rawvalue >0) %>%
+  ggplot(aes(x = v005_rawvalue, y = v044_rawvalue)) +
+  geom_point(color=ifelse(data_interim$state=="NY", "red", "black"), alpha=0.2)
+
+
+#grab all inequality 
+
+```
+
