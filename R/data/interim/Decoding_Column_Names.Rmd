@@ -40,16 +40,12 @@ descriptions %>% select(starts_with("v005_rawvalue"))
 ```{r}
 descriptions %>% select(starts_with("v005_rawvalue"))
 ```
-#read in the RDs
-```{r}
-readRDS('data/processed/colDesc_analysis2023.rds')
-```
+
 
 ##tried to use descriptions, almost but not quite 
 ```{r}
 plot_var_names = setNames(c("v044_rawvalue","v005_rawvalue"),
                           c("x", "y"))
-
 ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_names["y"])) +
   geom_point( alpha = 0.3) +
   labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
@@ -63,8 +59,14 @@ library(reshape2)
 library(dplyr)
 data_income = data_analytic_interim[ , c("state","county","v005_race_asian","v005_race_black","v005_race_hispanic", "v005_race_white")]
 
-#melted data for unemployment
+#melted data for preventable stays
 ndimdf_preventable = melt(data_income, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+
+meltplot <- ggplpot(ndimdf_preventable, aes(x='state', y='county'))+
+  geom_point(alpha = 0.2)+
+  labs(x='state', y ='county')+
+  theme
+
 ```
 #lets add race by color 
 ```{r}
@@ -78,7 +80,6 @@ ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_
 ```
 ```{r}
 #plots for y axis by race
-
 #gather all y axis colnames - i.e. preventable hospital stays by race 
 #our x axis will be the same, income inequality v044_rawvalue
 plot_var_names_list <- data_analytic_interim %>% select(starts_with('v005_race')) %>% colnames
@@ -86,10 +87,17 @@ plot_var_names_list <- data_analytic_interim %>% select(starts_with('v005_race')
 # Loop over the list of variable names
 for (y_var in plot_var_names_list) {
   # Generate the plot
-  p <- ggplot(data_analytic_interim, aes_string(x = "v044_rawvalue", y = y_var)) +
-    geom_point(alpha = 0.3) +
+  p <- ggplot(data_analytic_interim, aes_string(x = "v044_rawvalue", y = y_var))+
+    geom_point(alpha = 0.3, color='green') +
     labs(x = descriptions[["v044_rawvalue"]], y = descriptions[[y_var]]) +
-    theme_minimal()
+    theme(
+      plot.background = element_rect(fill = "black"),
+      panel.background = element_rect(fill = "black"),
+      axis.title = element_text(color = "white"),
+      axis.text = element_text(color = "white"),
+      legend.background = element_rect(fill = "black"),
+      legend.text = element_text(color = "white")
+    )
   
   # Print the plot
   print(p)
@@ -98,4 +106,55 @@ for (y_var in plot_var_names_list) {
 ```
 
 
+#
+```{r}
+library(tidyverse)
+
+# Reshape the data to long format
+data_long <- data_analytic_interim %>%
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
+
+# Generate the plot
+p <- ggplot(data_long, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.3) +
+  labs(x = descriptions[["v044_rawvalue"]], y = "Preventable Hospital Stays") +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+# Print the plot
+print(p)
+
+```
+
+```{r}
+library(tidyverse)
+
+# Reshape the data to long format
+data_long <- data_analytic_interim %>%
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
+
+# Generate the plot
+p <- ggplot(data_long, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.8) +
+  labs(x = descriptions[["v044_rawvalue"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("Asian", "AIAN", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+# Print the plot
+print(p)
+
+```
 
