@@ -158,3 +158,76 @@ data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_aian))+
 ```
 
 
+```{r}
+install.packages("reshape2")
+```
+
+
+
+#melted data
+
+```{r}
+library(reshape2)
+library(reshape2)
+library(dplyr)
+data_HSC = data_analytics[ , c("state","county","v005_race_asian","v005_race_black","v005_race_hispanic", "v005_race_white","v005_race_aian")]
+
+
+ndimdf_preventable = melt(data_HSC, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+```
+
+```{r}
+library(tidyverse)
+#plots for y axis by race
+
+#gather all y axis colnames - i.e. preventable hospital stays by race 
+#our x axis will be the same, income inequality v044_rawvalue
+plot_var_names_list <- data_analytics %>% select(starts_with('v005_race')) %>% colnames
+
+# Loop over the list of variable names
+for (y_var in plot_var_names_list) {
+  # Generate the plot
+  p <- ggplot(data_analytics, aes_string(x = "v168_rawvalue", y = y_var)) +
+    geom_point(alpha = 0.3) +
+    labs(x = descriptions[["v168_rawvalue"]], y = descriptions[[y_var]]) +
+    theme_minimal()
+  
+  # Print the plot
+  print(p)
+}
+
+```
+
+
+
+#Comparison between all races 
+```{r}
+library(tidyverse)
+
+data_long <- data_analytics %>%
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
+
+
+
+p <- ggplot(data_long, aes(x = v168_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.8) +
+  labs(x = descriptions[["v168_rawvalue"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("Asian", "AIAN", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+  print(p)
+```
+
+
+
+
+
+
+
