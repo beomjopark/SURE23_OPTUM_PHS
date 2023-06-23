@@ -40,11 +40,11 @@ data_analytics %>% ggplot( aes(x=v023_rawvalue, y=v005_rawvalue))+
 ```
 
 ```{r}
-data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_rawvalue))+
+data_analytics %>% ggplot(aes(x=v005_rawvalue, y=v168_rawvalue))+
   geom_point(color = ifelse(data_analytics$state =="CA", 'red', 'blue'), alpha=0.3) +
-  labs(x = "High School Completion", y= "Preventable Hospital Stays")
+  labs(x = "Preventable Hospital Stays", y= "High School Completion")
 ```
-#Above x= high school completion and y= Preventable hospital stays
+#Above only raw data specified.
 
 
 
@@ -59,13 +59,102 @@ data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_rawvalue))+
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Preventable Hospital Stays-Asian - High School Completion:
+
+```{r}
+data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_asian))+
+  geom_point (alpha=0.9) +
+  labs(x = "High School Completion", y= "Preventable Hospital Stays(Asian)")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+#Below Prevetable Hospital Stays (Black) - High School Completion:
+```{r}
+data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_black))+
+  geom_point (alpha=0.9) +
+  labs(x = "High School Completion", y= "Preventable Hospital Stays(Black)")
+```
+
+
+
+
+
+
+
+
+
+
+
+#Below are Preventable Hospital Stays (Hispanics) - High School Completion:
 
 
 
 ```{r}
-
+data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_hispanic))+
+  geom_point (alpha=0.9) +
+  labs(x = "High School Completion", y= "Preventable Hospital Stays(Hispanic)")
 ```
 
 
+
+
+
+
+
+
+#Below are Preventable hospital stays(White) - High School Completion
+```{r}
+data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_white))+
+  geom_point (alpha=0.9) +
+  labs(x = "High School Completion", y= "Preventable Hospital Stays(White)")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+#Below are Preventable Hospital Stays(American Indian/Alaska Native) - High School Completion
+```{r}
+data_analytics %>% ggplot(aes(x=v168_rawvalue, y=v005_race_aian))+
+  geom_point (alpha=0.9) +
+  labs(x = "High School Completion", y= "Preventable Hospital Stays(American Indian/Alaska Native)")
+```
 
 
