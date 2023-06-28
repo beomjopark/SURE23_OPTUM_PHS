@@ -152,23 +152,45 @@ ggplot(data_va, aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha
 
 #all 50 for asians
 data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222)
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians")
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth()
 
 
 #all 50 for black
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth()
 
 
 #all 50 for hispanic
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth()
 
 
 #all 50 for white
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth()
 
 View(data_all)
 
+
+
 ```
+
+```{r}
+# created with all melted data
+
+
+
+p <- ggplot(data_long, aes(x = v023_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.8) +
+  labs(x = descriptions[["v023_rawvalue"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("Asian", "AIAN", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+```
+
 
 
 
@@ -177,10 +199,10 @@ View(data_all)
 library(reshape2)
 library(reshape2)
 library(dplyr)
-data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black"   , "v024_race_hispanic", "v024_race_white")]
+data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black","v024_race_hispanic", "v024_race_white")]
 
 #melted data for unemployment
-ndimdf = melt(data_unemployment, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+ndimdf_unemploy = melt(data_unemployment, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
 ```
 
 
@@ -189,19 +211,21 @@ ndimdf = melt(data_unemployment, id = c("state", "county"),variable.name='race')
 
 library(maps)
 library(usdata)
-state_borders <- map_data("state")
+state_borders <- map_data("state") %>% 
+mutate(state = state2abbr(region)) %>% 
+select(-subregion)
 head(state_borders)
 
 state_unemployment = ndimdf %>%
-filter(!is.na(value), !state   %in% "US")  %>% 
+filter(!is.na(value), !state  %in% "US")  %>% 
 group_by(state) %>% 
 summarize(avg_unemployment_rate = mean(value)) %>% 
-mutate(lower_state = abbr2state(state))
+mutate(State = abbr2state(state)) #takes the abbreviations in state and spells it out in a new column called "State)
   
   
 state_unemployment_plot <- state_borders %>%
 left_join(state_unemployment,
-by = c("region" = "lower_state"))
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
 
 state_unemployment_plot %>%
 ggplot() +
@@ -210,12 +234,98 @@ group = group ,
 fill = avg_unemployment_rate),
 color = "black") +
 scale_fill_gradient(
-low = "white"
-,
+low = "white",
 high = "navy") +
 theme_void() +
 coord_map("polyconic") +
 labs(fill = "Avg Unemployment Rate1") +
 theme(legend.position = "bottom")
+```
+
+
+
+```{r}
+# Script to create variable description
+#
+# The original data has two rows:
+# 1. the long description and 2. the encoded name
+# Output is 1 row dataframe of desc (row1) with column names (row2)
+
+library(tidyverse)
+desc = colnames(read_csv("../data/raw/analytic_data2023_0.csv", n_max=1))
+
+
+enc = colnames(read_csv("../data/raw/analytic_data2023_0.csv", skip=1, n_max=1))
+
+descriptions = data.frame(t(desc))
+colnames(descriptions) = enc
+row.names(descriptions) = "description"
+saveRDS(descriptions, "data/processed/colDesc_analysis2023.rds")
+
+# Use case
+descriptions %>% select(starts_with("v023_rawvalue"))
+```
+
+
+
+```{r}
+# scatterplot with melted data
+
+library(tidyverse)
+library(reshape2)
+
+data_long <- data %>% 
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value") %>% 
+  filter(value < 15000)
+
+
+p <- ggplot(data_long, aes(x = v023_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.8) +
+  labs(x = descriptions[["v023_rawvalue"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth()
+
+  print(p)
+```
+#look at the obs that are above 15k in preventable hospitals and find patterns
+
+
+```{r}
+data_long <- data %>% 
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
+
+
+data_15k <- data %>% 
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value") %>% 
+  filter(value > 15000)
+
+data_geo15k <- data %>% 
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value") %>% 
+  filter(value > 15000) %>% 
+  select(state) %>% 
+  table()#selects var you want and then pipes into it to create a table/count
+
+
+
+```
+
+
+```{r}
+library(ggcorrplot)
+correlate3 = data_long %>% 
+  dplyr::select(state,v005_rawvalue, v023_rawvalue, v044_rawvalue, v168_rawvalue )
+
+cor_matrix = cor(correlate3)
+ggcorrplot(cor_matrix)
+  
+  
 ```
 
