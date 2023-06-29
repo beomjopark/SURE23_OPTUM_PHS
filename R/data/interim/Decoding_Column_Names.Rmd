@@ -246,6 +246,7 @@ corr_data <- data_analytic %>%
       #preventable stays
       v005_rawvalue,v005_race_asian, v005_race_aian, v005_race_hispanic, v005_race_white, v005_race_black,
        ) 
+colnames(corr_data) = descriptions %>% select(colnames(corr_data))
 corr_matrix <- cor(corr_data, use = "complete.obs")
 ggcorrplot(corr_matrix)+
   labs(x = "v044_rawvalue\nFootnote for x-axis variable",
