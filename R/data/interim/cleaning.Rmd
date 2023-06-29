@@ -37,7 +37,7 @@ single_values =which(single_value_cols)
 data_analytic %>% select(-single_values)
 
 data_analytic_interim <-  data_analytic %>% select(-single_values)
-
+saveRDS(data_analytic_interim, "../../data/interim/analytic2023_c1.rds")
 ```
 
 #we are now analyzing trends
