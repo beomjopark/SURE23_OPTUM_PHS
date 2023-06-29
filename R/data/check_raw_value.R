@@ -1,6 +1,6 @@
 # Read Data and Description
 analytic_data2023_0 = readRDS("./data/interim/analytic2023_c1.rds")
-analytic_data2023_0 =read_csv("data/raw/analytic_data2023_0.csv", skip=1)
+#analytic_data2023_0 =read_csv("data/raw/analytic_data2023_0.csv", skip=1)
 description = readRDS("./data/processed/colDesc_analysis2023.rds")
 
 # Grab proportion of racial group
