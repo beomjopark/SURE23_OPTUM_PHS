@@ -4,54 +4,15 @@ author: "Hugo Baca"
 date: "2023-07-01"
 output: html_document
 ---
-
+```{r}
+library(tidyverse)
+library(ggplot2)
+data_analytic<- readRDS("../../../../test/data/interim/analytic2023_c1.rds")
+```
 Motor vehicle deaths raw(v039):Number of motor vehicle crash deaths per 100,000 population.
-v039_rawvalue
-v039_numerator
-v039_denominator
-v039_cilow
-v039_cihigh
-v039_race_aian
-v039_race_aian_cilow
-v039_race_aian_cihigh
-v039_race_asian
-v039_race_asian_cilow
-v039_race_asian_cihigh
-v039_race_black
-v039_race_black_cilow
-v039_race_black_cihigh
-v039_race_hispanic
-v039_race_hispanic_cilow
-v039_race_hispanic_cihigh
-v039_race_white
-v039_race_white_cilow
-v039_race_white_cihigh
-
 Drive along to work (v067):Percentage of the workforce that drives alone to work.
-v067_rawvalue
-v067_numerator
-v067_denominator
-v067_cilow
-v067_cihigh
-v067_race_aian
-v067_race_aian_cilow
-v067_race_aian_cihigh
-v067_race_asian
-v067_race_asian_cilow
-v067_race_asian_cihigh
-v067_race_black
-v067_race_black_cilow
-v067_race_black_cihigh
-v067_race_hispanic
-v067_race_hispanic_cilow
-v067_race_hispanic_cihigh
-v067_race_white
-v067_race_white_cilow
-v067_race_white_cihigh
-
 Long Commute Alone (v137): Among workers who commute in their car alone, the percentage that commute more than 30 minutes.
-
-No break down by race
+No break down by race for 067 & 137
 
 ```{r}
 ggplot(data_analytic, aes(y = v005_rawvalue, x = v039_rawvalue))+

@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
 #read our cleaned up data into the env
-data_analytic<- readRDS("data/interim/analytic2023_c1.rds")
+data_analytic<- readRDS("../../../../test/data/interim/analytic2023_c1.rds")
 ```
 
 ```{r}
