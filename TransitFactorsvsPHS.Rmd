@@ -1,0 +1,47 @@
+---
+title: "TransitVarsvsPHS"
+author: "Hugo Baca"
+date: "2023-07-01"
+output: html_document
+---
+
+Motor vehicle deaths raw(v039):Number of motor vehicle crash deaths per 100,000 population.
+Drive along to work (v067):Percentage of the workforce that drives alone to work.
+Long Commute Alone (v137): Among workers who commute in their car alone, the percentage that commute more than 30 minutes.
+
+```{r}
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v039_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Number of motor vehicle crash deaths per 100,000 population.")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v067_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Percentage of the workforce that drives alone to work.")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v137_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Among workers who commute in their car alone, the percentage that commute more than 30 minutes.")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+```
+

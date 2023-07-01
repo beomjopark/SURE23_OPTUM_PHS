@@ -32,7 +32,6 @@ new_desc <- tibble::tibble(code = enc, desc = desc)
 # Use case
 descriptions %>% select(starts_with("v005_rawvalue"))
 
-
 #                                   v005_rawvalue
 #description Preventable Hospital Stays raw value
 ```
