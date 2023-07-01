@@ -1,0 +1,120 @@
+---
+title: "CommnityandSupportvsPHS"
+author: "Hugo Baca"
+date: "2023-07-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+#read our cleaned up data into the env
+data_analytic <- readRDS("../../../data/interim/analytic2023_c1.rds")
+```
+
+```{r}
+#Injury deaths Raw(v135):Number of deaths due to injury per 100,000 population.
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v135_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Number of deaths due to injury per 100,000 population")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+```
+
+```{r}
+v135_xaxis_vars <- c("v135_race_hispanic", "v135_race_white", "v135_race_asian", "v135_race_aian", "v135_race_black")
+#Race: Hispanic
+for(var in v135_xaxis_vars){
+  va135byracegraph <-ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, ":Number of deaths due to injury per 100,000 population.")) +
+    ylab("Preventable Hospital Stays")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(va135byracegraph)
+}
+
+```
+
+
+```{r}
+
+#Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v161_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Number of deaths due to suicide per 100,000 population (age-adjusted)")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+```
+
+```{r}
+v161_xaxis_vars <- c("v161_race_hispanic", "v161_race_white", "v161_race_asian", "v161_race_aian", "v161_race_black")
+#Race: Hispanic
+for(var in v161_xaxis_vars){
+  va161byracegraph <-ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, "Number of deaths due to suicide per 100,000 population (age-adjusted).")) +
+    ylab("Preventable Hospital Stays")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(va161byracegraph)
+}
+```
+
+```{r}
+#fire arm deaths raw(v148):Number of deaths due to firearms per 100,000 population.
+ggplot(data_analytic, aes(y = v005_rawvalue, x = v148_rawvalue))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Number of deaths due to firearms per 100,000 population.")) +
+  ylab("Preventable Hospital Stays")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+```
+
+```{r}
+v148_xaxis_vars <- c("v148_race_hispanic", "v148_race_white", "v148_race_asian", "v148_race_aian", "v148_race_black")
+#Race: Hispanic
+for(var in v148_xaxis_vars){
+  va148byracegraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, ":Number of deaths due to firearms per 100,000 population.")) +
+    ylab("Preventable Hospital Stays")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(va148byracegraph)
+}
+
+```
+
+
