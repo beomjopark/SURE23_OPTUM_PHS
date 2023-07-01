@@ -1,0 +1,280 @@
+---
+title: "Decoding "
+author: "Hugo Baca"
+date: "2023-06-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Script to create variable description
+#
+# The original data has two rows:
+# 1. the long description and 2. the encoded name
+# Output is 1 row dataframe of desc (row1) with column names (row2)
+library(tidyverse)
+desc = colnames(read_csv("../../../data/raw/analytic_data2023_0.csv", n_max=1))
+enc = colnames(read_csv("../../../data/raw/analytic_data2023_0.csv", skip=1, n_max=1))
+
+descriptions = data.frame(t(desc))
+colnames(descriptions) = enc
+row.names(descriptions) = "description"
+saveRDS(descriptions, "../../../data/processed/colDesc_analysis2023.rds")
+
+length(desc)
+length(enc)
+
+new_desc <- tibble::tibble(code = enc, desc = desc)
+
+# Use case
+descriptions %>% select(starts_with("v005_rawvalue"))
+
+
+#                                   v005_rawvalue
+#description Preventable Hospital Stays raw value
+```
+#Examples use case of description table
+```{r}
+descriptions %>% select(starts_with("v005_rawvalue"))
+```
+
+
+##tried to use descriptions, almost but not quite 
+```{r}
+plot_var_names = setNames(c("v044_rawvalue","v005_rawvalue"),
+                          c("x", "y"))
+ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_names["y"])) +
+  geom_point( alpha = 0.3) +
+  labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
+  theme_minimal()
+```
+
+#melt data 
+```{r}
+# reshape for unemployment variables 
+data_income = data_analytic_interim[ , c("state","county","v005_race_asian","v005_race_black","v005_race_hispanic", "v005_race_white")]
+
+#melted data for preventable stays
+ndimdf_preventable = melt(data_income, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
+
+meltplot <- ggplot(ndimdf_preventable, aes_string(x='state', y='county'))+
+  geom_point(alpha = 0.3)+
+  labs(x='state', y ='county')+
+  theme_bw()
+print(meltplot)
+```
+
+
+#lets add race by color 
+```{r}
+plot_var_names = setNames(c("v044_rawvalue", "v005_race_black"),
+                          c("x", "y"))
+
+ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_names["y"])) +
+  geom_point( alpha = 0.3) +
+  labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
+  theme_minimal()
+```
+
+```{r}
+#plots for y axis by race
+#gather all y axis colnames - i.e. preventable hospital stays by race 
+#our x axis will be the same, income inequality v044_rawvalue
+plot_var_names_list <- data_analytic_interim %>% select(starts_with('v005_race')) %>% colnames
+data_long_filtered <- data_long %>% filter(value <= 15000)
+
+# Loop over the list of variable names
+for (y_var in plot_var_names_list) {
+  # Generate the plot
+  p <- ggplot(data_analytic_interim, aes_string(x = "v044_rawvalue", y = y_var))+
+    geom_point(alpha = 0.3, color='green') +
+    geom_smooth() +
+    labs(x = descriptions[["v044_rawvalue"]], y = descriptions[[y_var]]) +
+    theme(
+      plot.background = element_rect(fill = "black"),
+      panel.background = element_rect(fill = "black"),
+      axis.title = element_text(color = "white"),
+      axis.text = element_text(color = "white"),
+      legend.background = element_rect(fill = "black"),
+      legend.text = element_text(color = "white")
+    )
+  
+  # Print the plot
+  print(p)
+}
+
+```
+
+
+
+```{r}
+library(tidyverse)
+# Reshape the data to long format
+data_long <- data_analytic_interim %>%
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
+
+# Generate the plot
+p <- ggplot(data_long, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  labs(x = descriptions[["v044_rawvalue"]], y = "Preventable Hospital Stays") +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+# Print the plot
+print(p)
+
+```
+
+```{r}
+# Generate the plot
+data_long_filtered <- data_long %>% filter(value <= 15000)
+
+p <- ggplot(data_long_filtered, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  xlab(paste(descriptions[["v044_rawvalue"]], "\nRatio of household income at the 80th percentile to income at the 20th percentile.")) +
+  ylab("Preventable Hospital Stays") +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+# Print the plot
+print(p)
+
+```
+
+```{r}
+# Generate the plot
+data_long_filtered <- data_long %>% filter(value >= 15000)
+
+p <- ggplot(data_long_filtered, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  xlab(paste(descriptions[["v044_rawvalue"]], "\nRatio of household income at the 80th percentile to income at the 20th percentile.")) +
+  ylab("Preventable Hospital Stays") +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+# Print the plot
+print(p)
+```
+
+```{r}
+# Generate the plot
+#data_long_filtered <- data_long %>% filter(value >= 15000)
+
+p <- ggplot(data_long, aes(x = v044_rawvalue, y = value, color = race)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  xlab(paste(descriptions[["v063_rawvalue"]], "\n Income where half of households in a county earn more and half of households earn less.")) +
+  ylab("Preventable Hospital Stays") +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+
+# Print the plot
+print(p)
+
+```
+
+
+#we have people are employed, educated, and earn well 
+#lets look at coorelation 
+```{r}
+library(ggcorrplot)
+corr_income_inq_media <- data_analytic %>% dplyr::select(v044_rawvalue,v063_rawvalue, v168_rawvalue ) 
+income_corr_matrix <- cor(corr_income_inq_media)
+ggcorrplot(income_corr_matrix, show.legend = TRUE)
+```
+
+
+```{r}
+library(ggcorrplot)
+corr_income_inq_media <- data_analytic_interim %>% dplyr::select(v044_rawvalue,v063_rawvalue ) 
+income_corr_matrix <- cor(corr_income_inq_media)
+ggcorrplot(income_corr_matrix) +
+  labs(x = "v044_rawvalue\nFootnote for x-axis variable",
+       y = "v063_rawvalue\nFootnote for y-axis variable") +
+  theme(axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2))
+```
+
+
+
+I would like to plot all income ineq. , education,  unemployment, and preventable stays
+We are missing data in the matrix
+```{r}
+library(ggcorrplot)
+corr_data <- data_analytic %>% 
+      dplyr::select(
+      #income inequality  
+      v044_rawvalue,
+      
+      #high school completion
+      v023_rawvalue, 
+      
+      #unemployment
+      v168_rawvalue,
+      
+      #preventable stays
+      v005_rawvalue,v005_race_asian, v005_race_aian, v005_race_hispanic, v005_race_white, v005_race_black,
+       ) 
+colnames(corr_data) = descriptions %>% select(colnames(corr_data))
+corr_matrix <- cor(corr_data, use = "complete.obs")
+ggcorrplot(corr_matrix)+
+  labs(x = "v044_rawvalue\nFootnote for x-axis variable",
+       y = "v063_rawvalue\nFootnote for y-axis variable") +
+  theme(axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2),
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+```
+#
+```{r}
+round_cor_matrix <-round(cor(corr_matrix), 2)
+ggcorrplot(round_cor_matrix,
+  hc.order = TRUE,
+  type = "lower",
+  lab = TRUE)+
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  )
+```
+#
+
+

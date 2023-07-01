@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-#
+
 ```{r}
 # Script to create variable description
 #
@@ -51,23 +51,23 @@ ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_
   labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
   theme_minimal()
 ```
+
 #melt data 
 ```{r}
 # reshape for unemployment variables 
-library(reshape2)
-library(reshape2)
-library(dplyr)
 data_income = data_analytic_interim[ , c("state","county","v005_race_asian","v005_race_black","v005_race_hispanic", "v005_race_white")]
 
 #melted data for preventable stays
 ndimdf_preventable = melt(data_income, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
 
-meltplot <- ggplpot(ndimdf_preventable, aes(x='state', y='county'))+
-  geom_point(alpha = 0.2)+
+meltplot <- ggplot(ndimdf_preventable, aes_string(x='state', y='county'))+
+  geom_point(alpha = 0.3)+
   labs(x='state', y ='county')+
-  theme
-
+  theme_bw()
+print(meltplot)
 ```
+
+
 #lets add race by color 
 ```{r}
 plot_var_names = setNames(c("v044_rawvalue", "v005_race_black"),
@@ -78,6 +78,7 @@ ggplot(data_analytic_interim, aes_string(x = plot_var_names["x"] , y = plot_var_
   labs(x = descriptions[[plot_var_names["x"]]], y = descriptions[[plot_var_names["y"]]]) +
   theme_minimal()
 ```
+
 ```{r}
 #plots for y axis by race
 #gather all y axis colnames - i.e. preventable hospital stays by race 
@@ -108,10 +109,9 @@ for (y_var in plot_var_names_list) {
 ```
 
 
-#
+
 ```{r}
 library(tidyverse)
-
 # Reshape the data to long format
 data_long <- data_analytic_interim %>%
   pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value")
@@ -129,7 +129,6 @@ p <- ggplot(data_long, aes(x = v044_rawvalue, y = value, color = race)) +
     legend.background = element_rect(fill = "black"),
     legend.text = element_text(color = "white")
   )
-
 # Print the plot
 print(p)
 
@@ -178,7 +177,6 @@ p <- ggplot(data_long_filtered, aes(x = v044_rawvalue, y = value, color = race))
 
 # Print the plot
 print(p)
-
 ```
 
 ```{r}
