@@ -142,29 +142,50 @@ library(tidyverse)
 library(ggplot2)
 
 #SCATTERPLOT
-#data_all = 
-#VIRGINIA
-data_va = data %>% filter(state =="VA") %>% 
-  select(153:162, 193:197, 183:187, 218:222)
-ggplot(data_va, aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.8 )+ ggtitle("unemployment vs preventable stays for asians in va")
+
 #had to skip first line in order to get the headers (no longer need to use backticks to reference columns)
 
 
-#all 50 for asians
+#all 50 for 3 variables
 data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222)
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth()
+
+
+
+testval= (ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_aian  )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for american indian and alaskan natives (aian) ") +geom_smooth() + xlim(0, 0.25) + ylim(0, 30000))
+
+#finding obs points that are in the 30K +
+find30k = data_all  %>% 
+  select(state, county, v023_rawvalue, v005_race_aian) %>% 
+  filter(v005_race_aian > 30000) %>% 
+  arrange(-v005_race_aian)
+  
+
+
+View(find30k)
+# sevier county, AR only has 4% of population that is AIAN in 2019
+#marion county, IN 
+
+
+
+
+#all 50 for asian
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
 
 
 #all 50 for black
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth()
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
 
 
 #all 50 for hispanic
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth()
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
 
 
 #all 50 for white
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth()
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
 
 View(data_all)
 
@@ -201,7 +222,7 @@ library(reshape2)
 library(dplyr)
 data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black","v024_race_hispanic", "v024_race_white")]
 
-#melted data for unemployment
+#melted data for unemployment ACTUALLY CHILDCARE
 ndimdf_unemploy = melt(data_unemployment, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
 ```
 
@@ -216,6 +237,7 @@ mutate(state = state2abbr(region)) %>%
 select(-subregion)
 head(state_borders)
 
+#gives an avg and filters ou territories, groups by state from melted data
 state_unemployment = ndimdf %>%
 filter(!is.na(value), !state  %in% "US")  %>% 
 group_by(state) %>% 
@@ -238,7 +260,7 @@ low = "white",
 high = "navy") +
 theme_void() +
 coord_map("polyconic") +
-labs(fill = "Avg Unemployment Rate1") +
+labs(fill = "Avg Unemployment Rate") +
 theme(legend.position = "bottom")
 ```
 
@@ -319,6 +341,32 @@ data_geo15k <- data %>%
 
 
 ```{r}
+#creating chloropleth of obs that are above 15k in preventable hospital stays 
+
+
+#melt the data15k values
+preventable_race_list <- c("v005_race_aian", "v005_race_asian", "v005_race_black", "v005_race_hispanic", "v005_race_white")
+
+#create new df that has preventable for all races w valuese more than 30000
+data_preventable = data %>% 
+  select(state, county, all_of(preventable_race_list)) 
+
+ndimdf_preventable1 = melt(data_preventable, id = c("state", "county"),variable.name='race')
+
+ndimdf_preventable15k = ndimdf_preventable1 %>% 
+  filter(value  > 15000)
+  
+ 
+#have to use melted data to create chloropleth data
+greater15k = ndimdf_preventable15k %>% 
+  filter(!is.na(value), !state  %in% "US") %>% 
+  group_by(state) %>% 
+  summarize(mean())
+
+```
+
+
+```{r}
 library(ggcorrplot)
 correlate3 = data_long %>% 
   dplyr::select(state,v005_rawvalue, v023_rawvalue, v044_rawvalue, v168_rawvalue )
@@ -327,5 +375,23 @@ cor_matrix = cor(correlate3)
 ggcorrplot(cor_matrix)
   
   
+```
+
+```{r}
+# plotting a bar graph 
+#create new df that includes the primary care ratio, # of PCP, population; do the same with other primary care providers; mammographhy screening and flu vaccination(includes race data)
+
+#v004 = prrimary care physicians 
+#v004_other=  other data = ratio of population to PCP
+
+"v005_rawvalue"  #153           "v005_numerator"           
+[155] "v005_denominator"          "v005_cilow"                "v005_cihigh"               "v005_race_aian"            "v005_race_asian"           "v005_race_black"           "v005_race_hispanic"       
+[162] "v005_race_white"   
+
+
+
+access_care = data[, c("state", "county",c(),   "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1")]
+access_care = data[, c("state", "county","v005_rawvalue","v005_numerator",   "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1")]
+ggplot()+geom_bar()+
 ```
 
