@@ -9,11 +9,25 @@ library(tidyverse)
 library(ggplot2)
 data_analytic<- readRDS("../../../../test/data/interim/analytic2023_c1.rds")
 ```
+Preventable Hospital stays(v005): Rate of hospital stays for ambulatory-care sensitive conditions per 100,000 Medicare enrollees.
 Motor vehicle deaths raw(v039):Number of motor vehicle crash deaths per 100,000 population.
 Drive along to work (v067):Percentage of the workforce that drives alone to work.
 Long Commute Alone (v137): Among workers who commute in their car alone, the percentage that commute more than 30 minutes.
 No break down by race for 067 & 137
 
+Let's collect the vars we anticiapte to use
+```{r}
+
+v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
+
+v039_xaxis_vars <- c("v039_race_hispanic", "v039_race_white", "v039_race_asian", "v039_race_aian", "v039_race_black")
+
+v067_xaxis_vars <- c("v067_race_hispanic", "v067_race_white", "v067_race_asian", "v067_race_aian", "v067_race_black")
+
+
+```
+
+Variables for Raw Value Graphs
 ```{r}
 ggplot(data_analytic, aes(y = v005_rawvalue, x = v039_rawvalue))+
   geom_point(color="green", alpha =0.5)+
@@ -50,11 +64,10 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v137_rawvalue))+
 
 ```
 
-
+Raw values vs vars(v039 & v067) by race - X & Y NOT LOG
 ```{r}
-v039_xaxis_vars <- c("v039_race_hispanic", "v039_race_white", "v039_race_asian", "v039_race_aian", "v039_race_black")
 for(var in v039_xaxis_vars){
-  va148byracegraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+  v039rawgraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
     xlab(paste(var, ":Number of motor vehicle crash deaths per 100,000 population.
@@ -67,13 +80,10 @@ for(var in v039_xaxis_vars){
           text = element_text(color = "white")) 
     print(va148byracegraph)
 }
-```
 
-```{r}
-v067_xaxis_vars <- c("v067_race_hispanic", "v067_race_white", "v067_race_asian", "v067_race_aian", "v067_race_black")
 #Race: Hispanic
 for(var in v067_xaxis_vars){
-  va148byracegraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+  v067rawgraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
     xlab(paste(var, ":Percentage of the workforce that drives alone to work.")) +
@@ -85,5 +95,113 @@ for(var in v067_xaxis_vars){
           text = element_text(color = "white")) 
     print(va148byracegraph)
 }
+
 ```
+Raw values vs vars(v039 & v067) by race - X & Y  LOG
+```{r}
+for(var in v039_xaxis_vars){
+  v039rawgraphLOG <- ggplot(data_analytic, aes_string(y = paste0("log(", "v005_rawvalue", ")"), x = paste0("log(", var, ")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, ":Log of number of motor vehicle crash deaths per 100,000 population")) +
+    ylab("Log of Preventable Hospital Stays")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(v039rawgraph)
+}
+
+for(var in v067_xaxis_vars){
+  v067rawgraphLOG <- ggplot(data_analytic, aes_string(y = paste0("log(", "v005_rawvalue", ")"), x = paste0("log(", var, ")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, ":Log of percentage of the workforce that drives alone to work")) +
+    ylab("Log of Preventable Hospital Stays")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(v067rawgraph)
+}
+
+```
+
+PHS by race vs vars(v039 & v067) by race: x and y axis are loged
+```{r}
+for(i in 1:length(v039_xaxis_vars)){
+  var_x <- v039_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  
+  v039byracegraphLOG <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":Number of motor vehicle crash deaths per 100,000 population.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+  print(v039byracegraph)
+}
+
+for(i in 1:length(v067_xaxis_vars)){
+  var_x <- v067_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  v067byracegraphLOG <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":Percentage of the workforce that drives alone to work.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+  print(v067byracegraph)
+}
+```
+
+PHS by race vs vars(v039 & v067) by race: x and y axis are non-log
+```{r}
+for(i in 1:length(v039_xaxis_vars)){
+  var_x <- v039_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  
+  v039byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x)) +
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":Number of motor vehicle crash deaths per 100,000 population.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white"))
+  print(v039byracegraph)
+}
+
+
+for(i in 1:length(v067_xaxis_vars)){
+  var_x <- v067_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  v067byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":Percentage of the workforce that drives alone to work.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white"))
+  print(v067byracegraph)
+  }
+
+```
+
+
 

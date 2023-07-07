@@ -1,0 +1,81 @@
+---
+title: "CommunitySupportMentalTransitCorralation"
+author: "Hugo Baca"
+date: "2023-07-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+data_analytic <- readRDS("../test/data/interim/analytic2023_c1.rds")
+```
+Transit Factors:
+Motor vehicle deaths raw(v039):Number of motor vehicle crash deaths per 100,000 population.
+Drive along to work (v067):Percentage of the workforce that drives alone to work.
+Long Commute Alone (v137): Among workers who commute in their car alone, the percentage that commute more than 30 minutes.
+
+Mental
+
+Communit & Support 
+# Ensure the ggcorrplot library is loaded
+```{r}
+library(ggcorrplot)
+#select vall desired variables
+corr_data <- data_analytic %>% 
+  dplyr::select(
+    #transit factors
+    v039_rawvalue, 
+    v137_rawvalue, #racial data dne
+    v067_rawvalue, 
+    
+    v039_race_hispanic, v039_race_white, v039_race_asian, v039_race_aian, v039_race_black,
+    v067_race_hispanic, v067_race_white, v067_race_asian, v067_race_aian, v067_race_black, 
+  
+    #mental health, 
+    v042_rawvalue, 
+    v145_rawvalue,
+    v002_rawvalue, 
+    v138_rawvalue, 
+    v063_rawvalue, 
+    
+    v138_race_hispanic, v138_race_white, v138_race_asian, v138_race_aian, v138_race_black,
+    v063_race_hispanic, v063_race_white, v063_race_asian, v063_race_aian, v063_race_black,
+
+    #community and support
+    v135_rawvalue, 
+    v161_rawvalue,
+    v148_rawvalue,
+    
+    v135_race_hispanic, v135_race_white, v135_race_asian, v135_race_aian, v135_race_black, 
+    v161_race_hispanic, v161_race_white, v161_race_asian, v161_race_aian, v161_race_black,
+    v148_race_hispanic, v148_race_white, v148_race_asian, v148_race_aian, v148_race_black,
+    
+    #preventable stays
+    v005_rawvalue,
+    v005_race_hispanic, v005_race_white, v005_race_asian, v005_race_aian, v005_race_black
+  ) 
+
+# Compute correlation matrix
+corr_matrix <- cor(corr_data, use = "complete.obs")
+
+# Create correlation plot
+ggcorrplot(corr_matrix)+
+  labs(x = "v044_rawvalue\nFootnote for x-axis variable",
+       y = "v063_rawvalue\nFootnote for y-axis variable") +
+  theme(axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2),
+        plot.background = element_rect(fill = "black"),
+        panel.background = element_rect(fill = "black"),
+        axis.title = element_text(color = "white"),
+        axis.text = element_text(color = "white"),
+        legend.background = element_rect(fill = "black"),
+        legend.text = element_text(color = "white")
+  )
+  
+```
+

@@ -1,0 +1,44 @@
+---
+title: "TransitFactorsUpdate"
+author: "Hugo Baca"
+date: "2023-07-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+data_analytic <- readRDS("../../../../test/data/interim/analytic2023_c1.rds")
+data_log <- log(data_analytic)
+# Create a list with the two datasets
+data_list <- list("raw" = data_analytic, "log" = data_log)
+
+# Define the variables to be looped over
+vars <- list(
+  v039 = c("v039_rawvalue", "Number of motor vehicle crash deaths per 100,000 population."),
+  v067 = c("v067_rawvalue", "Percentage of the workforce that drives alone to work."),
+  v137 = c("v137_rawvalue", "Among workers who commute in their car alone, the percentage that commute more than 30 minutes.")
+)
+
+# Loop over each dataset in the list
+for(i in seq_along(data_list)) {
+  # Loop over each variable in vars
+  for(var in vars) {
+    ggplot(data_list[[i]], aes_string(y = "v005_rawvalue", x = var[[1]])) +
+      geom_point(color="green", alpha =0.5) +
+      geom_smooth() +
+      xlab(var[[2]]) +
+      ylab("Preventable Hospital Stays") +
+      theme(panel.background = element_rect(fill = "black"),
+            plot.background = element_rect(fill = "black"),
+            panel.grid.major = element_line(color = "white", size = 0.1),
+            panel.grid.minor = element_line(color = "white", size = 0.05),
+            text = element_text(color = "white")) -> p
+    print(p)
+  }
+}
+```

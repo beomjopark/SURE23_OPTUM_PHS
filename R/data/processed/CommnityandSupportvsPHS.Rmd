@@ -29,31 +29,35 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v135_rawvalue))+
         panel.grid.minor = element_line(color = "white", size = 0.05),
         text = element_text(color = "white"))
 ```
-
+RACE ADUSTED 
 ```{r}
 v135_xaxis_vars <- c("v135_race_hispanic", "v135_race_white", "v135_race_asian", "v135_race_aian", "v135_race_black")
-#Race: Hispanic
-for(var in v135_xaxis_vars){
-  va135byracegraph <-ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
+
+# assuming the length of both vectors is the same
+for(i in 1:length(v135_xaxis_vars)){
+  var_x <- v135_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  
+  va135byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
-    xlab(paste(var, ":Number of deaths due to injury per 100,000 population.")) +
-    ylab("Preventable Hospital Stays")+
+    xlab(paste(var_x, ":Number of deaths due to injury per 100,000 population.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
     theme(panel.background = element_rect(fill = "black"),
           plot.background = element_rect(fill = "black"),
           panel.grid.major = element_line(color = "white", size = 0.1),
           panel.grid.minor = element_line(color = "white", size = 0.05),
           text = element_text(color = "white")) 
-    print(va135byracegraph)
+  print(va135byracegraph)
 }
-
 ```
 
 
 ```{r}
 
 #Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
-ggplot(data_analytic, aes(y = v005_rawvalue, x = v161_rawvalue))+
+ggplot(data_analytic, aes(y = v005_rawvalue, x = log(v161_rawvalue)))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
   xlab(paste("Number of deaths due to suicide per 100,000 population (age-adjusted)")) +
@@ -65,21 +69,29 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v161_rawvalue))+
         text = element_text(color = "white"))
 ```
 
+
+
 ```{r}
 v161_xaxis_vars <- c("v161_race_hispanic", "v161_race_white", "v161_race_asian", "v161_race_aian", "v161_race_black")
 #Race: Hispanic
-for(var in v161_xaxis_vars){
-  va161byracegraph <-ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
+
+# assuming the length of both vectors is the same
+for(i in 1:length(v135_xaxis_vars)){
+  var_x <- v135_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  
+  va135byracegraph <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y,")"), x = paste0("log(",var_x,")")))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
-    xlab(paste(var, "Number of deaths due to suicide per 100,000 population (age-adjusted).")) +
-    ylab("Preventable Hospital Stays")+
+    xlab(paste(var_x, ":Number of deaths due to suicide per 100,000 population (age-adjusted)")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
     theme(panel.background = element_rect(fill = "black"),
           plot.background = element_rect(fill = "black"),
           panel.grid.major = element_line(color = "white", size = 0.1),
           panel.grid.minor = element_line(color = "white", size = 0.05),
           text = element_text(color = "white")) 
-    print(va161byracegraph)
+  print(va135byracegraph)
 }
 ```
 
@@ -101,20 +113,25 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v148_rawvalue))+
 ```{r}
 v148_xaxis_vars <- c("v148_race_hispanic", "v148_race_white", "v148_race_asian", "v148_race_aian", "v148_race_black")
 #Race: Hispanic
-for(var in v148_xaxis_vars){
-  va148byracegraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
+
+# assuming the length of both vectors is the same
+for(i in 1:length(v135_xaxis_vars)){
+  var_x <- v135_xaxis_vars[i]
+  var_y <- v005_race_yaxis[i]
+  
+  va135byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
-    xlab(paste(var, ":Number of deaths due to firearms per 100,000 population.")) +
-    ylab("Preventable Hospital Stays")+
+    xlab(paste(var_x, ":Number of deaths due to injury per 100,000 population.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
     theme(panel.background = element_rect(fill = "black"),
           plot.background = element_rect(fill = "black"),
           panel.grid.major = element_line(color = "white", size = 0.1),
           panel.grid.minor = element_line(color = "white", size = 0.05),
           text = element_text(color = "white")) 
-    print(va148byracegraph)
+  print(va135byracegraph)
 }
-
 ```
 
 
