@@ -1,0 +1,125 @@
+---
+title: "SaturatedModel"
+author: "Hugo Baca"
+date: "2023-07-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(tidymodels)
+library(glmnet)
+
+#import Data
+data_analytic<- readRDS("../test/data/interim/analytic2023_c1.rds")
+#impoort Desc Dictionary
+desc <- readRDS("../test/data/processed/colDesc_analysis2023.rds")
+```
+```{r}
+#select vall desired variables
+model_data <- data_analytic %>% 
+  dplyr::select(
+    #transit factors
+    v039_rawvalue, 
+    v137_rawvalue, #racial data dne
+    v067_rawvalue, 
+    #Motor vehicle deaths raw(v039)
+    v039_race_hispanic, v039_race_white, v039_race_asian, v039_race_aian, v039_race_black,
+    #Drive along to work (v067)
+    v067_race_hispanic, v067_race_white, v067_race_asian, v067_race_aian, v067_race_black, 
+  
+    #mental health, 
+    v042_rawvalue, 
+    v145_rawvalue,
+    v002_rawvalue, 
+    v138_rawvalue, 
+    v063_rawvalue, 
+    #Drug overdose (v138)
+    v138_race_hispanic, v138_race_white, v138_race_asian, v138_race_aian, v138_race_black,
+    #Median House Hold Income(v063
+    v063_race_hispanic, v063_race_white, v063_race_asian, v063_race_aian, v063_race_black,
+
+    #community and support
+    v135_rawvalue, 
+    v161_rawvalue,
+    v148_rawvalue,
+    
+    #Injury deaths Raw(v135)
+    v135_race_hispanic, v135_race_white, v135_race_asian, v135_race_aian, v135_race_black, 
+    #Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
+    v161_race_hispanic, v161_race_white, v161_race_asian, v161_race_aian, v161_race_black,
+    #fire arm deaths raw(v148):Number of deaths due to firearms per 100,000 population.
+    v148_race_hispanic, v148_race_white, v148_race_asian, v148_race_aian, v148_race_black,
+    
+    #preventable stays
+    v005_rawvalue,
+    v005_race_hispanic, v005_race_white, v005_race_asian, v005_race_aian, v005_race_black
+  ) 
+```
+
+
+Divide data into matrix of predictors and vector of response
+```{r}
+init_ridge_glmnet <- glmnet(model_x, model_y,
+alpha = 0)
+```
+
+```{r}
+linear_reg() %>%
+  set_mode(mode = "regression") %>%
+  set_engine(engine = "lm")
+```
+```{r}
+lm_spec <- linear_reg()
+```
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(tidymodels)
+library(glmnet)
+
+# Assuming the data is already loaded and selected
+# The selected data is stored in 'model_data'
+
+# Split the data into training and testing sets
+set.seed(123)
+data_split <- initial_split(model_data, prop = 0.75, strata = '')
+train_data <- training(data_split)
+test_data <- testing(data_split)
+
+# Define the model specification
+# Here we're using a linear regression model as an example. You may want to replace it with the appropriate model for your data.
+model_spec <- linear_reg() %>%
+  set_engine('glmnet')
+
+# Define the recipe
+# Here we're using all predictors. You may want to replace '.' with your specific predictors.
+# 'your_response_variable' should be replaced with your actual response variable.
+recipe_spec <- recipe(your_response_variable ~ ., data = train_data) %>%
+  step_normalize(all_predictors())
+
+# Bundle the preprocessor and model into a workflow
+workflow <- workflow() %>%
+  add_model(model_spec) %>%
+  add_recipe(recipe_spec)
+
+# Fit the model
+model_fit <- workflow %>% fit(data = train_data)
+
+# Print the model fit
+print(model_fit)
+
+# Make predictions on the test data
+predictions <- predict(model_fit, new_data = test_data)
+
+# Evaluate the model
+metrics <- metrics(predictions, truth = 'your_response_variable')
+print(metrics)
+```
+

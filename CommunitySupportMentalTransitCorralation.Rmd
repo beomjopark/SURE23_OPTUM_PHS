@@ -3,6 +3,8 @@ title: "CommunitySupportMentalTransitCorralation"
 author: "Hugo Baca"
 date: "2023-07-06"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -14,15 +16,39 @@ library(tidyverse)
 library(ggplot2)
 data_analytic <- readRDS("../test/data/interim/analytic2023_c1.rds")
 ```
-Transit Factors:
+Preventable Hospital stays(v005): Rate of hospital stays for ambulatory-care sensitive conditions per 100,000 Medicare enrollees.
 Motor vehicle deaths raw(v039):Number of motor vehicle crash deaths per 100,000 population.
 Drive along to work (v067):Percentage of the workforce that drives alone to work.
 Long Commute Alone (v137): Among workers who commute in their car alone, the percentage that commute more than 30 minutes.
+No break down by race for 067 & 137
 
-Mental
+Preventable Hospital stays(v005): Rate of hospital stays for ambulatory-care sensitive conditions per 100,000 Medicare enrollees.
 
-Communit & Support 
-# Ensure the ggcorrplot library is loaded
+MHD(v042_rawvalue):Average number of mentally unhealthy days reported in past 30 days (age-adjusted).
+
+#FMD(v145):Percentage of adults reporting 14 or more days of poor mental health per month (age-adjusted).
+
+#PFH(v002):Percentage of adults reporting fair or poor health (age-adjusted).
+
+Drug overdose (v138): Number of drug poisoning deaths per 100,000 population.
+
+Poor mental Health Days (v042):Average number of mentally unhealthy days reported in past 30 days (age-adjusted).
+
+Median House Hold Income(v063):The income where half of households in a county earn more and half of households earn less.
+
+Median House Hold Income(v063):The income where half of households in a county earn more and half of households earn less.
+
+Income Inequality(v044):Ratio of household income at the 80th percentile to income at the 20th percentile.
+
+#Injury deaths Raw(v135):Number of deaths due to injury per 100,000 population.
+
+#Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
+
+#fire arm deaths raw(v148):Number of deaths due to firearms per 100,000 population.
+
+Income Inequality(v044):Ratio of household income at the 80th percentile to income at the 20th percentile.
+#Injury deaths Raw(v135):Number of deaths due to injury per 100,000 population.
+
 ```{r}
 library(ggcorrplot)
 #select vall desired variables
@@ -32,8 +58,9 @@ corr_data <- data_analytic %>%
     v039_rawvalue, 
     v137_rawvalue, #racial data dne
     v067_rawvalue, 
-    
+    #Motor vehicle deaths raw(v039)
     v039_race_hispanic, v039_race_white, v039_race_asian, v039_race_aian, v039_race_black,
+    #Drive along to work (v067)
     v067_race_hispanic, v067_race_white, v067_race_asian, v067_race_aian, v067_race_black, 
   
     #mental health, 
@@ -42,8 +69,9 @@ corr_data <- data_analytic %>%
     v002_rawvalue, 
     v138_rawvalue, 
     v063_rawvalue, 
-    
+    #Drug overdose (v138)
     v138_race_hispanic, v138_race_white, v138_race_asian, v138_race_aian, v138_race_black,
+    #Median House Hold Income(v063
     v063_race_hispanic, v063_race_white, v063_race_asian, v063_race_aian, v063_race_black,
 
     #community and support
@@ -51,8 +79,11 @@ corr_data <- data_analytic %>%
     v161_rawvalue,
     v148_rawvalue,
     
+    #Injury deaths Raw(v135)
     v135_race_hispanic, v135_race_white, v135_race_asian, v135_race_aian, v135_race_black, 
+    #Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
     v161_race_hispanic, v161_race_white, v161_race_asian, v161_race_aian, v161_race_black,
+    #fire arm deaths raw(v148):Number of deaths due to firearms per 100,000 population.
     v148_race_hispanic, v148_race_white, v148_race_asian, v148_race_aian, v148_race_black,
     
     #preventable stays
@@ -64,7 +95,7 @@ corr_data <- data_analytic %>%
 corr_matrix <- cor(corr_data, use = "complete.obs")
 
 # Create correlation plot
-ggcorrplot(corr_matrix)+
+ggcorrplot(corr_matrix, hc.order = TRUE, hc.method = )+
   labs(x = "v044_rawvalue\nFootnote for x-axis variable",
        y = "v063_rawvalue\nFootnote for y-axis variable") +
   theme(axis.title.x = element_text(vjust = -2),
@@ -73,9 +104,12 @@ ggcorrplot(corr_matrix)+
         panel.background = element_rect(fill = "black"),
         axis.title = element_text(color = "white"),
         axis.text = element_text(color = "white"),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         legend.background = element_rect(fill = "black"),
         legend.text = element_text(color = "white")
   )
   
 ```
+
+
 

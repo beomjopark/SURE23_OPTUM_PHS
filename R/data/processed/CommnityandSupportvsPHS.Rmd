@@ -55,7 +55,6 @@ for(i in 1:length(v135_xaxis_vars)){
 
 
 ```{r}
-
 #Suicide raw(v161):Number of deaths due to suicide per 100,000 population (age-adjusted).
 ggplot(data_analytic, aes(y = v005_rawvalue, x = log(v161_rawvalue)))+
   geom_point(color="green", alpha =0.5)+
@@ -69,10 +68,7 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = log(v161_rawvalue)))+
         text = element_text(color = "white"))
 ```
 
-
-
 ```{r}
-v161_xaxis_vars <- c("v161_race_hispanic", "v161_race_white", "v161_race_asian", "v161_race_aian", "v161_race_black")
 #Race: Hispanic
 v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
 
@@ -120,7 +116,7 @@ for(i in 1:length(v135_xaxis_vars)){
   var_x <- v135_xaxis_vars[i]
   var_y <- v005_race_yaxis[i]
   
-  va135byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x))+
+  va135byracegraph <-ggplot(data_analytic, aes_string(y = log(var_y), x = var_x))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
     xlab(paste(var_x, ":Number of deaths due to injury per 100,000 population.")) +

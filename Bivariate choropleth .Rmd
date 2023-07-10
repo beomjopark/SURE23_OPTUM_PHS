@@ -1,0 +1,20 @@
+---
+title: "Bivariate choropleth"
+author: "Hugo Baca"
+date: "2023-07-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(tidyverse)
+library(viridis)
+library(ggplot2)
+
+data_analytic<- readRDS("../test/data/interim/analytic2023_c1.rds")
+```
+
