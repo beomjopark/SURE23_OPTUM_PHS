@@ -1,0 +1,282 @@
+---
+title: "PCP vs PHS"
+output: html_document
+date: "2023-07-07"
+---
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+data = read_csv("data/raw/analytic_data2023_0.csv", skip = 1)
+
+```
+
+
+```{r}
+access_care = data[, c("state", "county","v005_rawvalue","v005_numerator", "v005_denominator","v005_race_aian", "v005_race_asian","v005_race_black", "v005_race_white", "v005_race_hispanic", "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1", "v050_rawvalue", "v050_numerator", "v050_denominator", "v050_race_aian", "v050_race_asian", "v050_race_black", "v050_race_white", "v050_race_hispanic",  "v155_rawvalue", "v155_numerator", "v155_denominator", "v155_race_aian", "v155_race_asian", "v155_race_black", "v155_race_white", "v155_race_hispanic", "v062_rawvalue", "v062_other_data_1"  )]
+
+
+races = c("aian", "asian", "black", "white", "hispanic")
+
+for (subgroup in races) {
+  plot <- ggplot(access_care, aes(x = log(v004_other_data_1), y = log(get(paste0("v005_race_", subgroup))))) +
+    geom_point(alpha = 0.5, color = "purple") +
+    ggtitle(paste("Ratio of PCP to population vs PHS for", subgroup))+xlab("Log Transformed Ratio of Population to PCP")+
+    labs(y = paste("PHS for", subgroup)) + xlim(5, 10) +ylim(5,11) +geom_smooth()
+  print(plot)
+}
+
+```
+
+```{r}
+for (subgroup_other in races) {
+  plot <- ggplot(access_care, aes(log(x = v131_other_data_1), y = log(get(paste0("v005_race_", subgroup_other))))) +
+    geom_point(alpha = 0.5, color = "orange") +
+    ggtitle(paste("Ratio of Other PCP to population vs PHS for", subgroup_other))+xlab("Log Transformed Ratio of Population to Other PCP")+
+    labs(y = paste("PHS for", subgroup_other)) + xlim(4, 9) +ylim(4.5,11) +geom_smooth()
+  print(plot)
+}
+
+
+```
+
+
+
+
+```{r}
+for (subgroup_mental in races) {
+  plot <- ggplot(access_care, aes(x = log(v062_other_data_1), y = log(get(paste0("v005_race_", subgroup_mental))))) +
+    geom_point(alpha = 0.8, color = "yellow") +
+    ggtitle(paste("Log Transformed Ratio of Mental Health Providers to population vs PHS for", subgroup_mental))+xlab("Ratio of Population to Mental Health Providers")+
+    labs(y = paste("PHS for", subgroup_mental)) +xlim(2.5, 11) +ylim(5,12)+ geom_smooth()
+    print(plot)
+}
+```
+
+
+
+```{r}
+
+library(maps)
+library(usdata)
+state_borders <- map_data("state") %>% 
+mutate(state = state2abbr(region)) %>% 
+select(-subregion)
+head(state_borders)
+#chloropleth for PCP
+
+mental_chloro = access_care %>%
+filter(!is.na(v062_other_data_1), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_mental_ratio = mean(v062_other_data_1)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+mental_chloro_plot <- state_borders %>%
+left_join(mental_chloro,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+mental_chloro_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_mental_ratio),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "AVG Mental Health Provider Ratio by State") +
+theme(legend.position = "bottom")
+
+
+
+
+#MENTAL MEDIAN 
+mental_chloro_median = access_care %>%
+filter(!is.na(v062_other_data_1), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(median_mental_ratio = median(v062_other_data_1)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+mental_chloro_plot_median <- state_borders %>%
+left_join(mental_chloro_median,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+mental_chloro_plot_median %>% 
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = median_mental_ratio),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "MEDIAN Mental Health Provider Ratio by State") +
+theme(legend.position = "bottom")
+
+#would a darker color mean that it is better or worse? 
+# ratio = population / # of profeessionals --> lower number of professionals could lead to a darker color 
+```
+
+
+```{r}
+#checking distribution of ratio of mental health providers
+
+distribution = list(access_care$v004_other_data_1, access_care$v131_other_data_1, access_care$v062_other_data_1)
+    
+for (i in 1:length(distribution)){
+  dis = hist(distribution[[i]], main = paste("Histogram of", i ), xlab = i) 
+  print(dis)
+
+}
+#graph # 1 = PCP
+#2 = other providers other than PCP
+#3 = mental health providers
+
+
+
+#find the values that are negative within mental health providers
+#use dplyr to select this column and arrange in descending ordeer
+
+find_neg_mental = access_care %>% arrange(-v062_other_data_1) %>% select(state, county, v062_other_data_1) %>% table()
+
+find_neg_mental
+
+library(dplyr)
+find_neg_mental1 <- access_care %>%
+  select(state, county, v062_other_data_1) %>%
+  arrange(-v062_other_data_1) %>%
+  table() %>%
+  as.data.frame() %>%
+  mutate(county_state = paste(county, state, sep = ", ")) %>%
+  select(county_state, Freq) %>%
+  arrange(desc(Freq))
+```
+```{r}
+#BIVARIATE CHLOROPLETH
+library(usmap)
+library(ggplot2)
+library(biscale)
+library(maps)
+library(usdata)
+
+state_borders <- map_data("state") %>% 
+mutate(state = state2abbr(region)) %>% 
+select(-subregion)
+head(state_borders)
+
+bi_chloro = access_care %>%
+filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %>% 
+group_by(state) 
+
+#join
+bi_chloro_plot <- state_borders %>%
+left_join(bi_chloro,
+by = join_by(state == state ))
+
+bi_test <- ggplot() +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group), fill = "v004_other_data_1", color = "black")+   
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = "v062_other_data_1"), color = "black")+
+  scale_fill_gradient(name1 = "PCP", low = "blue", high = "red") +
+  scale_fill_gradient(name2 = "Mental", low = "green", high = "yellow") +
+  theme_void()
+
+bi_test <- ggplot() +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group), fill = "v004_other_data_1", color = "black")+   
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = "v062_other_data_1"), color = "black")+
+  scale_fill_gradient(low = "blue", high = "red") +
+  scale_fill_gradient(low = "green", high = "yellow") +
+  labs(fill = "PCP", color = "Mental") +
+  theme_void()
+
+
+bi_test <- ggplot() +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = v004_other_data_1), color = "black") +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = v062_other_data_1), color = "black") +
+  scale_fill_gradient(name = "PCP", low = "blue", high = "red") +
+  scale_fill_gradient(name = "Mental", low = "grey", high = "yellow") +
+  theme_void()
+
+bi_test <- ggplot() +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = v004_other_data_1), color = "black") +
+  geom_polygon(data = bi_chloro_plot, aes(x = long, y = lat, group = group, fill = v062_other_data_1), color = "black") +
+  scale_fill_gradientn(name = "PCP", colours = c("blue", "red")) +
+  scale_fill_gradientn(name = "Mental", colours = c("grey", "yellow")) +
+  theme_void()
+
+bi_test
+
+```
+
+
+```{r}
+install.packages(c("cowplot", "sf"))
+library(sf)
+library(cowplot)
+data_bi = bi_class(bi_chloro_plot, x = v004_other_data_1, y = v062_other_data_1, style = "quantile", dim = 3)
+
+#creating a new column that specifues spatial geometry (long, lat)
+data_bi = data_bi %>%
+  st_as_sf(coords = c("long", "lat"), crs = 5070)
+
+map <- ggplot() +
+  geom_sf(data = data_bi, mapping = aes(fill = bi_class, geometry = geometry), color = "white", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) +
+  labs(
+    title = "PCP and Mental Health Across US") +
+  bi_theme()
+
+
+legend <- bi_legend(pal = "GrPink",
+                    dim = 3,
+                    xlab = "Higher % PCP ",
+                    ylab = "Higher % Mental Health ",
+                    size = 10)
+
+finalPlot <- ggdraw() +
+  draw_plot(map, 0, 0, 1, 1) +
+  draw_plot(legend, 0.8, .25, 1, 1)
+
+finalPlot
+```
+```{r}
+#version 2 of bivsriiate
+
+library(cowplot)
+data_bi <- data_bi %>%
+  st_as_sf(coords = c("long", "lat"), crs = 4326)
+
+data_bi1 =  data_bi %>% 
+  mutate(biVar = bi_class) %>% 
+  select(-bi_class)
+
+map <- ggplot() +
+  geom_sf(data = data_bi1, mapping = aes(fill = biVar), color = "black", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) +
+  labs(
+  title = "PCP and Mental Across US",) +
+  bi_theme()
+
+legend <- bi_legend(pal = "GrPink",
+                    dim = 3,
+                    xlab = "Higher % PCP",
+                    ylab = "Higher % Mental Health",
+                    size = 5)
+
+finalPlot <- ggdraw() +
+  draw_plot(map, 0, 0.15, 0.9, 0.9) +
+  draw_plot(legend, 0.85, 0.25,0.2,0.7) 
+
+finalPlot
+
+finalPlotCow = cowplot::plot_grid(map, legend, ncol = 2, rel_widths = c(0.8, 0.2))
+
+finalPlotCow
+```
+

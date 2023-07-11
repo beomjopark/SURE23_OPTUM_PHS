@@ -145,10 +145,8 @@ library(ggplot2)
 
 #had to skip first line in order to get the headers (no longer need to use backticks to reference columns)
 
-
 #all 50 for 3 variables
 data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222)
-
 
 
 testval= (ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_aian  )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for american indian and alaskan natives (aian) ") +geom_smooth() + xlim(0, 0.25) + ylim(0, 30000))
@@ -160,12 +158,9 @@ find30k = data_all  %>%
   arrange(-v005_race_aian)
   
 
-
 View(find30k)
 # sevier county, AR only has 4% of population that is AIAN in 2019
 #marion county, IN 
-
-
 
 
 #all 50 for asian
@@ -188,8 +183,6 @@ ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha
 
 
 View(data_all)
-
-
 
 ```
 
@@ -220,11 +213,12 @@ p <- ggplot(data_long, aes(x = v023_rawvalue, y = value, color = race)) +
 library(reshape2)
 library(reshape2)
 library(dplyr)
-data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black","v024_race_hispanic", "v024_race_white")]
+data_unemployment = data[ , c("state", "county","v024_race_aian","v024_race_asian","v024_race_black","v024_race_hispanic", "v024_race_white")]  #actually v024 is the childcare
 
 #melted data for unemployment ACTUALLY CHILDCARE
 ndimdf_unemploy = melt(data_unemployment, id = c("state", "county"),variable.name='race') #this melts the county and state instead of the others
 ```
+
 
 
 ```{r}
@@ -343,7 +337,7 @@ data_geo15k <- data %>%
 ```{r}
 #creating chloropleth of obs that are above 15k in preventable hospital stays 
 
-
+library(reshape2)
 #melt the data15k values
 preventable_race_list <- c("v005_race_aian", "v005_race_asian", "v005_race_black", "v005_race_hispanic", "v005_race_white")
 
@@ -353,6 +347,8 @@ data_preventable = data %>%
 
 ndimdf_preventable1 = melt(data_preventable, id = c("state", "county"),variable.name='race')
 
+
+
 ndimdf_preventable15k = ndimdf_preventable1 %>% 
   filter(value  > 15000)
   
@@ -361,7 +357,59 @@ ndimdf_preventable15k = ndimdf_preventable1 %>%
 greater15k = ndimdf_preventable15k %>% 
   filter(!is.na(value), !state  %in% "US") %>% 
   group_by(state) %>% 
-  summarize(mean())
+  summarize(phs_rate_15k = mean(value))
+
+state_prevent_plot15k <- state_borders %>%
+left_join(greater15k,
+by = join_by(state == state ))
+
+state_prevent_plot15k %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = phs_rate_15k),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "States with Counties with PHS rates higher than 15k") +
+theme(legend.position = "bottom")
+
+#EXAMPLE
+library(maps)
+library(usdata)
+state_borders <- map_data("state") %>% 
+mutate(state = state2abbr(region)) %>% 
+select(-subregion)
+head(state_borders)
+
+#gives an avg and filters ou territories, groups by state from melted data
+state_prevent_all = ndimdf_preventable1 %>%
+filter(!is.na(value), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_phs_rate = mean(value)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+state_prevent_plot <- state_borders %>%
+left_join(state_prevent_all,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+state_prevent_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_phs_rate),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg PHS Rate") +
+theme(legend.position = "bottom")
 
 ```
 
@@ -382,16 +430,212 @@ ggcorrplot(cor_matrix)
 #create new df that includes the primary care ratio, # of PCP, population; do the same with other primary care providers; mammographhy screening and flu vaccination(includes race data)
 
 #v004 = prrimary care physicians 
-#v004_other=  other data = ratio of population to PCP
+#v004_other=   ratio of population to PCP
+#v050 mammography screening
+#131 = other primary care physicians
+# 155 flu vaccination 
+access_care = data[, c("state", "county","v005_rawvalue","v005_numerator", "v005_denominator","v005_race_aian", "v005_race_asian","v005_race_black", "v005_race_white", "v005_race_hispanic", "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1", "v050_rawvalue", "v050_numerator", "v050_denominator", "v050_race_aian", "v050_race_asian", "v050_race_black", "v050_race_white", "v050_race_hispanic",  "v155_rawvalue", "v155_numerator", "v155_denominator", "v155_race_aian", "v155_race_asian", "v155_race_black", "v155_race_white", "v155_race_hispanic"  )]
 
-"v005_rawvalue"  #153           "v005_numerator"           
-[155] "v005_denominator"          "v005_cilow"                "v005_cihigh"               "v005_race_aian"            "v005_race_asian"           "v005_race_black"           "v005_race_hispanic"       
-[162] "v005_race_white"   
+flu = access_care %>% select(1,2,3, 6:10, 23, 26:30)
+melt_flu = melt(flu, id = c("state", "county", "v005_rawvalue", "v155_rawvalue"),variable.name='race')
+mammogram = access_care %>%  select(1,2,3, 6:10, 15, 18:22)
+melt_mammography = melt(mammogram, id = c("state", "county", "v005_rawvalue", "v050_rawvalue"),variable.name='race' )
+
+```
 
 
 
-access_care = data[, c("state", "county",c(),   "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1")]
-access_care = data[, c("state", "county","v005_rawvalue","v005_numerator",   "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1")]
-ggplot()+geom_bar()+
+
+
+```{r}
+# scatterplot of flu
+
+flu_scatter <- ggplot(melt_flu, aes(x = v155_rawvalue, y = v005_rawvalue, color = race)) +
+  geom_point(alpha = 0.2) +
+  labs(x = descriptions[["v155_rawvalue/Flu Vax Rate"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "White", "Hispanic")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth()
+
+  print(flu_scatter)
+  
+#individual
+  
+ggplot(flu, aes(x = v155_race_aian, y = v005_race_aian )) + geom_point(alpha = 0.8, color = "orange") + ggtitle("flu vax rates vs preventable stays for aian") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(flu, aes(x = v155_race_asian, y = v005_race_asian )) + geom_point(alpha = 0.8, color = "blue") + ggtitle("flu vax rates vs preventable stays for asian") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(flu, aes(x = v155_race_black, y = v005_race_black )) + geom_point(alpha = 0.8, color = "green") + ggtitle("flu vax rates vs preventable stays for black") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(flu, aes(x = v155_race_white, y = v005_race_white )) + geom_point(alpha = 0.8, color = "pink") + ggtitle("flu vax rates vs preventable stays for white") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(flu, aes(x = v155_race_hispanic, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "red") + ggtitle("flu vax rates vs preventable stays for hispanic") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+```
+```{r}
+mammogram_scatter <- ggplot(melt_mammography, aes(x = v050_rawvalue, y = v005_rawvalue, color = race)) +
+  geom_point(alpha = 0.2) +
+  labs(x = descriptions[["v050_rawvalue/Mammogram Screening Rate"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "White", "Hispanic")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth()
+
+  print(mammogram_scatter)
+  
+#individual
+  
+ggplot(mammogram, aes(x = v050_race_aian, y = v005_race_aian )) + geom_point(alpha = 0.8, color = "orange") + ggtitle("mammogram rates vs preventable stays for aian") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+
+ggplot(mammogram, aes(x = v050_race_asian, y = v005_race_asian )) + geom_point(alpha = 0.8, color = "blue") + ggtitle("mammogram rates vs preventable stays for asian") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(mammogram, aes(x = v050_race_black, y = v005_race_black )) + geom_point(alpha = 0.8, color = "green") + ggtitle("mammogram rates vs preventable stays for black") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+
+ggplot(mammogram, aes(x = v050_race_white, y = v005_race_white )) + geom_point(alpha = 0.8, color = "pink") + ggtitle("mammogram rates vs preventable stays for white") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+ggplot(mammogram, aes(x = v050_race_hispanic, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "red") + ggtitle("mammogram ratesvs preventable stays for hispanic") +geom_smooth() + xlim(0, 0.8) + ylim(0, 30000)
+```
+
+```{r}
+
+#chloropleth for flu
+flu_chloro = melt_flu %>%
+filter(!is.na(value), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_flu_vax_rate = mean(v155_rawvalue)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+flu_chloro_plot <- state_borders %>%
+left_join(flu_chloro,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+flu_chloro_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_flu_vax_rate),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg Flu Vax Rate") +
+theme(legend.position = "bottom")
+
+
+#chloropleth for mammograms
+mam_chloro = melt_mammography %>%
+filter(!is.na(value), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_mam_rate = mean(v050_rawvalue)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+mam_chloro_plot <- state_borders %>%
+left_join(mam_chloro,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+mam_chloro_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_mam_rate),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg Mammorgraphy Rate") +
+theme(legend.position = "bottom")
+```
+
+```{r}
+#chloropleth for PCP
+pcp_chloro = access_care %>%
+filter(!is.na(v004_other_data_1), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_pcp_ratio = mean(v004_other_data_1)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+pcp_chloro_plot <- state_borders %>%
+left_join(pcp_chloro,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+pcp_chloro_plot %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_pcp_ratio),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg PCP Ratio by State") +
+theme(legend.position = "bottom")
+
+#chloropleth for other PCP
+pcp_chloro1 = access_care %>%
+filter(!is.na(v131_other_data_1), !state  %in% "US")  %>% 
+group_by(state) %>% 
+summarize(avg_other_pcp_ratio = mean(v131_other_data_1)) 
+ #takes the abbreviations in state and spells it out in a new column called "State)
+  
+  
+pcp_chloro_plot1 <- state_borders %>%
+left_join(pcp_chloro1,
+by = join_by(state == state ))#state_borders) #joins on common key in df1 and df2 
+
+pcp_chloro_plot1 %>%
+ggplot() +
+geom_polygon(aes(x = long, y = lat,
+group = group ,
+fill = avg_other_pcp_ratio),
+color = "black") +
+scale_fill_gradient(
+low = "white",
+high = "navy") +
+theme_void() +
+coord_map("polyconic") +
+labs(fill = "Avg Other PCP Ratio by State") +
+theme(legend.position = "bottom")
+```
+```{r}
+#plotting PCP against the PHS via race
+
+#PCP AIAIN
+
+ggplot(access_care, aes( x = v004_other_data_1, y = v005_race_aian)) + geom_point(alpha = 0.8, color = "blue") + ggtitle("Ratio of PCP to Population vs PHS for AIAN")
+#PCP ASIAN
+ggplot(access_care, aes( x = v004_other_data_1, y = v005_race_asian)) + geom_point(alpha = 0.8, color = "blue") + ggtitle("Ratio of PCP to Population vs PHS for ASIAN")
+#PCP BLACK
+ggplot(access_care, aes( x = v004_other_data_1, y = v005_race_black)) + geom_point(alpha = 0.8, color = "blue") + ggtitle("Ratio of PCP to Population vs PHS for BLACK")
+#PCP WHITE 
+ggplot(access_care, aes( x = v004_other_data_1, y = v005_race_white)) + geom_point(alpha = 0.8, color = "blue") + ggtitle("Ratio of PCP to Population vs PHS for WHITE")
+#PCP HISPANIC
+ggplot(access_care, aes( x = v004_other_data_1, y = v005_race_hispanic)) + geom_point(alpha = 0.8, color = "blue") + ggtitle("Ratio of PCP to Population vs PHS for HISPANIC")
+
+
+races = c("aian", "asian", "black", "white", "hispanic")
+
+for (subgroup in races) {
+  plot <- ggplot(access_care, aes(x = v004_other_data_1, y = get(paste0("v005_race_", subgroup)))) +
+    geom_point(alpha = 0.8, color = "blue") +
+    ggtitle(paste("Ratio of PCP to population vs PHS for", subgroup))
+  print(plot)
+}
+
+
 ```
 
