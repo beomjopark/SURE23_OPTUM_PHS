@@ -1,0 +1,232 @@
+---
+title: "Test Write Up"
+author: "Megan"
+date: "2023-07-13"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    theme: lumen
+    code_folding: show
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+# Title: Preventable Hospital Stays
+
+
+# Executive Summary: 
+The objective of this research is to identify some of the factors that play a big role in preventable hospital stays in the United States by county, some of those sub factors include: Health Behaviors, and Social and Economic factors. A lot of these factors can differ from county to county.
+
+
+# Introduction 
+The data was collected and analyzed from countyhealthrankings.org .We researched income inequality, unemployment and high school completion rates to see if it affects the number of preventable hospital stays of certain racial groups at the county level.
+
+
+# Motivation 
+We are studying how income inequality, unemployment, and high school completion affect the quantity of preventable hospital stays. By researching this, we may uncover patterns in quality of life, access to care, and socio-economic factors. We aspire to model examples that result in improved disparities and predict quality of life. 
+
+
+
+# Social Economic Factors:
+We examined the rate of preventable hospital stays with Unemployment, High School Completion, and Income inequality.
+
+Results:
+(insert graphs of Unemployment)
+
+(insert graphs of High school Completion)
+
+(insert graphs of Income inequality)
+```{r}
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+#SCATTERPLOT
+data = read_csv("data/raw/analytic_data2023_0.csv", skip = 1)
+
+
+#had to skip first line in order to get the headers (no longer need to use backticks to reference columns)
+
+#all 50 for 3 variables
+data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222)
+
+
+#all 50 for asian
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
+
+
+#all 50 for black
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
+
+
+#all 50 for hispanic
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
+
+
+#all 50 for white
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+
+
+
+```
+
+
+
+Based on the factors of Unemployment, High School Completion, and Income Inequality we were not able to see a lot of contribution for Preventable Hospital stays, therefore we decided to move into:  Community safety as it reflects not only violent acts in neighborhoods and homes, but also injuries caused unintentionally through accidents.
+
+
+
+## Variables that matter
+- PCP Ration
+- Test
+
+# Health Behaviors
+During this research we also took into consideration Health Behaviors such as Drug Overdose Deaths with Preventable Hospital Stays, which contribute a big part of the findings. Number of drug poisoning deaths per 100,000 population. The 2023 County Health Rankings used data from 2018-2020 for this measure.
+Drug overdose deaths are a leading contributor to premature death and are largely preventable.
+
+
+## Variables Definition:
+
+## Pre-processing Methods:
+
+
+## Analysis 
+### Hypothesis
+
+
+# Exploratory Data Analysis
+explain process with EDA
+##Scatterplots
+put code chunks here with stuff
+
+```{r}
+
+```
+
+##Chloropleths
+put code chunks here with stuff
+
+## Bivariate Chloropleth
+```{r}
+access_care = data[, c("state", "fipscode", "county","v005_rawvalue","v005_numerator", "v005_denominator","v005_race_aian", "v005_race_asian","v005_race_black", "v005_race_white", "v005_race_hispanic", "v004_rawvalue", "v004_other_data_1" , "v131_rawvalue" , "v131_other_data_1", "v050_rawvalue", "v050_numerator", "v050_denominator", "v050_race_aian", "v050_race_asian", "v050_race_black", "v050_race_white", "v050_race_hispanic",  "v155_rawvalue", "v155_numerator", "v155_denominator", "v155_race_aian", "v155_race_asian", "v155_race_black", "v155_race_white", "v155_race_hispanic", "v062_rawvalue", "v062_other_data_1"  )]
+
+#MAKE THIS TIDIER; JUST AN EXAMPLE CHUNK FOR NOW
+#BIVARIATE CHLOROPLETH
+library(usmap)
+library(ggplot2)
+library(biscale)
+library(maps)
+library(usdata)
+
+state_borders <- map_data("state") %>% 
+mutate(state = state2abbr(region)) %>% 
+select(-subregion)
+head(state_borders)
+
+bi_chloro = access_care %>%
+filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %>% 
+group_by(state) 
+
+#join
+bi_chloro_plot <- state_borders %>%
+left_join(bi_chloro,
+by = join_by(state == state ))
+
+
+library(cowplot)
+library(sf)
+library(biscale)
+library(tidycensus)
+library(sf)
+library(tidyr)
+county_geospatial_df =
+  tidycensus::get_acs(geography = "county",
+                      variables = "B19013_001",
+                      geometry = TRUE, year = 2021) %>%
+  select(-variable, -moe, -estimate) %>%
+  separate(col = 'NAME', into = c('county', 'state'), sep = ',') %>%
+  mutate(state = usdata::state2abbr(state)) %>%
+  tigris::shift_geometry()
+  
+data_bi1 = bi_class(bi_chloro_plot, x = v005_rawvalue, y = v004_other_data_1, style = "quantile", dim = 3)
+
+#CHECK THS CODE
+data_bi1 =  data_bi1 %>% 
+  mutate(biVar = bi_class) %>% 
+  select(-(1:4)) %>% 
+  select(-bi_class)
+  
+
+
+#join two dataframes
+county_bivar = merge(data_bi1, county_geospatial_df, by = c("state", "county"))
+county_bivar = unique(county_bivar)
+
+#county_bivar = county_bivar %>% select(-long) %>% 
+#select(-lat)
+
+#county_bivar %>% relocate("geometry", .after = "county")
+
+
+#data_bi1 <- data_bi1 %>%
+  #st_as_sf(coords = "geometry", crs = 4326)
+
+
+map <- ggplot() +
+  geom_sf(data = county_bivar, mapping = aes(fill = biVar, geometry = geometry), color = "black", size = 0.1, show.legend = FALSE) +
+  bi_scale_fill(pal = "GrPink", dim = 3) +
+  labs(
+  title = "PCP vs PHS Across US",) +
+  bi_theme()
+
+legend <- bi_legend(pal = "GrPink",
+                    dim = 3,
+                    xlab = "Higher % PCP",
+                    ylab = "Higher % Mental Health",
+                    size = 5)
+
+finalPlotCow = cowplot::plot_grid(map, legend, ncol = 2, rel_widths = c(0.8, 0.2))
+
+finalPlotCow
+```
+
+Write information that was gathered from EDA
+
+# Modeling 
+
+## Ex: Linear Reg
+inset code chunk with model
+
+### Description of Model
+- include specific consideratinos
+- tuning
+
+### Prediction Result for Linear Reg
+
+## Ex: Random Forest
+
+### Description of Model
+- include specific consideratinos
+- tuning
+
+### Prediction Result for Random Forest
+
+## CART
+
+### Description of Model
+- include specific consideratinos
+- tuning
+
+### Prediction Result for CART
+
+##Comparing RMSE
+
+## Diagnonstics
+
+# Conclusion

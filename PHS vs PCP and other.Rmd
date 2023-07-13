@@ -23,7 +23,7 @@ for (subgroup in races) {
   plot <- ggplot(access_care, aes(x = log(v004_other_data_1), y = log(get(paste0("v005_race_", subgroup))))) +
     geom_point(alpha = 0.5, color = "purple") +
     ggtitle(paste("Ratio of PCP to population vs PHS for", subgroup))+xlab("Log Transformed Ratio of Population to PCP")+
-    labs(y = paste("PHS for", subgroup)) + xlim(5, 10) +ylim(5,11) +geom_smooth()
+    labs(y = paste("PHS for", subgroup)) + xlim(5, 10) +ylim(5,11) + geom_smooth() +geom_smooth(method = "lm", color = "red")
   print(plot)
 }
 
@@ -49,9 +49,12 @@ for (subgroup_mental in races) {
   plot <- ggplot(access_care, aes(x = log(v062_other_data_1), y = log(get(paste0("v005_race_", subgroup_mental))))) +
     geom_point(alpha = 0.8, color = "yellow") +
     ggtitle(paste("Log Transformed Ratio of Mental Health Providers to population vs PHS for", subgroup_mental))+xlab("Ratio of Population to Mental Health Providers")+
-    labs(y = paste("PHS for", subgroup_mental)) +xlim(2.5, 11) +ylim(5,12)+ geom_smooth()
+    labs(y = paste("PHS for", subgroup_mental)) +xlim(2.5, 11) +ylim(5,12)+ geom_smooth() + annotate(11,12, label=(paste0("slope==",coef(lm(access_care$(get(paste0("v005_race_", subgroup_mental)))~access_care$v062_other_data_1)))))
     print(plot)
 }
+
+
+
 ```
 
 
@@ -215,36 +218,7 @@ bi_test
 ```
 
 
-```{r}
-install.packages(c("cowplot", "sf"))
-library(sf)
-library(cowplot)
-data_bi = bi_class(bi_chloro_plot, x = v004_other_data_1, y = v062_other_data_1, style = "quantile", dim = 3)
 
-#creating a new column that specifues spatial geometry (long, lat)
-data_bi = data_bi %>%
-  st_as_sf(coords = c("long", "lat"), crs = 5070)
-
-map <- ggplot() +
-  geom_sf(data = data_bi, mapping = aes(fill = bi_class, geometry = geometry), color = "white", size = 0.1, show.legend = FALSE) +
-  bi_scale_fill(pal = "GrPink", dim = 3) +
-  labs(
-    title = "PCP and Mental Health Across US") +
-  bi_theme()
-
-
-legend <- bi_legend(pal = "GrPink",
-                    dim = 3,
-                    xlab = "Higher % PCP ",
-                    ylab = "Higher % Mental Health ",
-                    size = 10)
-
-finalPlot <- ggdraw() +
-  draw_plot(map, 0, 0, 1, 1) +
-  draw_plot(legend, 0.8, .25, 1, 1)
-
-finalPlot
-```
 ```{r}
 #version 2 of bivsriiate
 
