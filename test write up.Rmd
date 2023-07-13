@@ -3,15 +3,15 @@ title: "Test Write Up"
 author: "Megan"
 date: "2023-07-13"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
     toc: yes
     toc_depth: 3
     toc_float: yes
     theme: lumen
     code_folding: show
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
 ---
 
 # Title: Preventable Hospital Stays
@@ -130,7 +130,8 @@ select(-subregion)
 head(state_borders)
 
 bi_chloro = access_care %>%
-filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %>% 
+#  mutate(v004_other_data_1 = 1/ v004_other_data_1) %>%
+#filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %>% 
 group_by(state) 
 
 #join
@@ -158,8 +159,9 @@ library(tidyr)
 #saveRDS(county_geospatial_df, "./data/external/county_acs.rds")
 # Load acs data
 county_geospatial_df = readRDS("./data/external/county_acs.rds")
-  
-data_bi1 = bi_class(bi_chloro, x = v005_rawvalue, y = v004_other_data_1, style = "quantile", dim = 3)
+
+n_color_dim = 2
+data_bi1 = bi_class(bi_chloro, x = v005_rawvalue, y = v004_rawvalue, style = "quantile", dim = n_color_dim)
 
 
 
@@ -171,23 +173,23 @@ data_bi1 = bi_class(bi_chloro, x = v005_rawvalue, y = v004_other_data_1, style =
 #  select(-(1:4)) %>% 
 #  select(-bi_class)
   
-
-
+#data_bi1$bi_class = rep("3-3", nrow(data_bi1))
 #join two dataframes
 county_bivar = merge(data_bi1, county_geospatial_df, by = c("state", "county"))
 
-
+description = readRDS("./data/processed/colDesc_analysis2023.rds")
+#description[["v004_other_data_1"]] = "PCP Ratio"#"Population / PCPs."
 map <- ggplot() +
   geom_sf(data = county_bivar, mapping = aes(fill = bi_class, geometry = geometry), color = "lightgray", size = 0.1, show.legend = FALSE) +
-  bi_scale_fill(pal = "GrPink", dim = 3) +
+  bi_scale_fill(pal = "GrPink", dim = n_color_dim, na.value="transparent") +
   labs(
   title = "PCP vs PHS Across US",) +
   bi_theme()
 
 legend <- bi_legend(pal = "GrPink",
-                    dim = 3,
-                    xlab = "Higher % PCP",
-                    ylab = "Higher % Mental Health",
+                    dim = n_color_dim,
+                    xlab = sub(" raw value", "", description[["v005_rawvalue"]]),
+                    ylab = sub(" raw value", "", description[["v004_rawvalue"]]),
                     size = 5)
 
 finalPlotCow = cowplot::plot_grid(map, legend, ncol = 2, rel_widths = c(0.8, 0.2))
