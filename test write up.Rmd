@@ -134,9 +134,9 @@ filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %
 group_by(state) 
 
 #join
-bi_chloro_plot <- state_borders %>%
-left_join(bi_chloro,
-by = join_by(state == state ))
+#bi_chloro_plot <- state_borders %>%
+#left_join(bi_chloro,
+#by = "state")
 
 
 library(cowplot)
@@ -145,41 +145,40 @@ library(biscale)
 library(tidycensus)
 library(sf)
 library(tidyr)
-county_geospatial_df =
-  tidycensus::get_acs(geography = "county",
-                      variables = "B19013_001",
-                      geometry = TRUE, year = 2021) %>%
-  select(-variable, -moe, -estimate) %>%
-  separate(col = 'NAME', into = c('county', 'state'), sep = ',') %>%
-  mutate(state = usdata::state2abbr(state)) %>%
-  tigris::shift_geometry()
+
+#county_geospatial_df =
+#  tidycensus::get_acs(geography = "county",
+#                      variables = "B19013_001",
+#                      geometry = TRUE, year = 2021) %>%
+#  select(-variable, -moe, -estimate) %>%
+#  separate(col = 'NAME', into = c('county', 'state'), sep = ',') %>%
+#  mutate(state = usdata::state2abbr(state)) %>%
+#  tigris::shift_geometry()
+# Save acs data
+#saveRDS(county_geospatial_df, "./data/external/county_acs.rds")
+# Load acs data
+county_geospatial_df = readRDS("./data/external/county_acs.rds")
   
-data_bi1 = bi_class(bi_chloro_plot, x = v005_rawvalue, y = v004_other_data_1, style = "quantile", dim = 3)
+data_bi1 = bi_class(bi_chloro, x = v005_rawvalue, y = v004_other_data_1, style = "quantile", dim = 3)
+
+
 
 #CHECK THS CODE
-data_bi1 =  data_bi1 %>% 
-  mutate(biVar = bi_class) %>% 
-  select(-(1:4)) %>% 
-  select(-bi_class)
+#data_bi1 =  data_bi1
+#%>% 
+#  rename(biVar = bi_class)
+#  mutate(biVar = bi_class) %>% 
+#  select(-(1:4)) %>% 
+#  select(-bi_class)
   
 
 
 #join two dataframes
 county_bivar = merge(data_bi1, county_geospatial_df, by = c("state", "county"))
-county_bivar = unique(county_bivar)
-
-#county_bivar = county_bivar %>% select(-long) %>% 
-#select(-lat)
-
-#county_bivar %>% relocate("geometry", .after = "county")
-
-
-#data_bi1 <- data_bi1 %>%
-  #st_as_sf(coords = "geometry", crs = 4326)
 
 
 map <- ggplot() +
-  geom_sf(data = county_bivar, mapping = aes(fill = biVar, geometry = geometry), color = "black", size = 0.1, show.legend = FALSE) +
+  geom_sf(data = county_bivar, mapping = aes(fill = bi_class, geometry = geometry), color = "lightgray", size = 0.1, show.legend = FALSE) +
   bi_scale_fill(pal = "GrPink", dim = 3) +
   labs(
   title = "PCP vs PHS Across US",) +
