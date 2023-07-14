@@ -130,4 +130,117 @@ for(i in 1:length(v135_xaxis_vars)){
 }
 ```
 
+#suicide v161_rawvalue vs long commute Long Commute Alone (v137)
+```{r}
+#fire arm deaths raw(v148):Number of deaths due to firearms per 100,000 population.
+ggplot(data_analytic, aes(y = log(v161_rawvalue), x = log(v137_rawvalue)))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("long commute Long Commute Alone.")) +
+  ylab("suicide")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
 
+```
+#suicide v161_rawvalue vs Drive alone to work (v067)
+```{r}
+ggplot(data_analytic, aes(y = log(v161_rawvalue), x = log(v067_rawvalue)))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Drive alone to work")) +
+  ylab("suicide")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+```
+#PHS vs Drive alone  (v067)
+```{r}
+ggplot(data_analytic, aes(y = log(v005_rawvalue), x = log(v067_rawvalue)))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Drive Alone to Work")) +
+  ylab("PHS")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+```
+
+```{r}
+ggplot(data_analytic, aes(y = log(v005_rawvalue), x = log(v161_rawvalue)))+
+  geom_point(color="green", alpha =0.5)+
+  geom_smooth()+
+  xlab(paste("Suicide")) +
+  ylab("PHS")+
+  theme(panel.background = element_rect(fill = "black"),
+        plot.background = element_rect(fill = "black"),
+        panel.grid.major = element_line(color = "white", size = 0.1),
+        panel.grid.minor = element_line(color = "white", size = 0.05),
+        text = element_text(color = "white"))
+
+```
+
+We want to plot preventable hospital stay by race and income inequality raw value
+```{r}
+for(i in 1:length(v044_race_xaxis)){
+  var_x <- v044_race_vars[i]
+  var_y <- v005_race_vars[i]
+  
+  v044byracegraph <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":income inequality.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+  print(v044byracegraph)
+}
+```
+
+We want to plot phs by race and median income by race
+```{r}
+for(i in 1:length(v063_race_vars)){
+  var_x <- v063_race_vars[i]
+  var_y <- v005_race_vars[i]
+  
+  v063byracegraph <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var_x, ":Median income.")) +
+    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+  print(v063byracegraph)
+}
+```
+
+```{r}
+medianincomrace <- c("v063_race_asian","v063_race_white", "v063_race_aian", "v063_race_hispanic", "v063_race_black")
+  for(var in medianincomrace){
+  v063racegraph <- ggplot(data_analytic, aes_string(y = "v063_rawvalue", x = var))+
+    geom_point(color="green", alpha =0.5)+
+    geom_smooth()+
+    xlab(paste(var, ":median income by race.")) +
+    ylab("Median income raw")+
+    theme(panel.background = element_rect(fill = "black"),
+          plot.background = element_rect(fill = "black"),
+          panel.grid.major = element_line(color = "white", size = 0.1),
+          panel.grid.minor = element_line(color = "white", size = 0.05),
+          text = element_text(color = "white")) 
+    print(v063racegraph)
+}
+```

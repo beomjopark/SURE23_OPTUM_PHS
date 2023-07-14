@@ -6,6 +6,7 @@ data_analytic<- readRDS("data/interim/analytic2023_c1.rds")
 #Injury deaths Raw(v135):Number of deaths due to injury per 100,000 population.
 ggplot(data_analytic, aes(y = v005_rawvalue, x = v135_rawvalue))+
   geom_point(color="green", alpha =0.5)+
+  geom_smooth(method="lm", col="red") +
   geom_smooth()+
   xlab(paste("Number of deaths due to injury per 100,000 population")) +
   ylab("Preventable Hospital Stays")+

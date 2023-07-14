@@ -14,6 +14,7 @@ library(tidyverse)
 library(ggplot2)
 #read our cleaned up data into the env
 data_analytic<- readRDS("../../../../test/data/interim/analytic2023_c1.rds")
+desc <- readRDS("../../../data/processed/colDesc_analysis2023.rds")
 ```
 
 Let's collect all variables we expect to use
@@ -33,25 +34,25 @@ Poor mental Health Days (v042):Average number of mentally unhealthy days reporte
 Median House Hold Income(v063):The income where half of households in a county earn more and half of households earn less.
 
 Income Inequality(v044):Ratio of household income at the 80th percentile to income at the 20th percentile.
+
+Collect vars with race breakdown
 ```{r}
-v005_race_yaxis <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
+v005_race_vars <- c("v005_race_hispanic","v005_race_white","v005_race_asian","v005_race_aian","v005_race_black")
 
-v138_xaxis_vars <- c("v138_race_hispanic", "v138_race_white", "v138_race_asian", "v138_race_aian", "v138_race_black")
+v138_race_vars <- c("v138_race_hispanic", "v138_race_white", "v138_race_asian", "v138_race_aian", "v138_race_black")
 
-v063_race_xaxis <- c("v063_race_hispanic", "v063_race_white", "v063_race_asian", "v063_race_aian", "v063_race_black")
-
+v063_race_vars <- c("v063_race_hispanic", "v063_race_white", "v063_race_asian", "v063_race_aian", "v063_race_black")
 
 ```
 
-We want to plot poor mental health days raw vaue and PHS raw value
+PHS vs Poor Mental health days raw
 ```{r}
-#race break down DNE
 #PMHD(v042_rawvalue):Average number of mentally unhealthy days reported in past 30 days (age-adjusted).
-ggplot(data_analytic, aes(y = v005_rawvalue, x = v042_rawvalue))+
+ggplot(data_analytic, aes(y =v005_rawvalue, x = v042_rawvalue))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab(paste("Average number of mentally unhealthy days reported in past 30 days (age-adjusted).")) +
-  ylab("Preventable Hospital Stays")+
+  xlab(desc[["v042_rawvalue"]]) +
+  ylab(desc[["v005_rawvalue"]])+
   theme(panel.background = element_rect(fill = "black"),
            plot.background = element_rect(fill = "black"),
            panel.grid.major = element_line(color = "white", size = 0.1),
@@ -59,16 +60,15 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v042_rawvalue))+
            text = element_text(color = "white"))
 ```
 
-We want to plot poor mental health days raw value and PHS by Race
+
 ```{r}
-#we want to plot poor mental health days and PHS by race
 #PMHD(v042_rawvalue):Average number of mentally unhealthy days reported in past 30 days (age-adjusted).
-for( var in v005_race_yaxis){
-v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = var, x = "v042_rawvalue"))+
+for( var in v005_race_vars){
+v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = "(v042_rawvalue)"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab("Average number of mentally unhealthy days reported in past 30 days (age-adjusted).") +
-  ylab(paste(v005_race_yaxis,":Preventable Hospital Stays"))+
+  xlab(desc[["v042_rawvalue"]]) +
+  ylab(desc[[var]])+
   theme(panel.background = element_rect(fill = "black"),
            plot.background = element_rect(fill = "black"),
            panel.grid.major = element_line(color = "white", size = 0.1),
@@ -82,12 +82,12 @@ We want to plot frequent mental distress raw value and PHS raw value
 ```{r}
 #race break down DNE
 #frequent mental distress
-ggplot(data_analytic, aes(y = v005_rawvalue, x = v145_rawvalue))+
+ggplot(data_analytic, aes(y = log(v005_rawvalue), x = log(v145_rawvalue)))+
   geom_point(color="green",alpha =0.5)+
   geom_smooth() +
-  xlab(paste(":Percentage of adults reporting 14 or more days of poor mental health per month (age-adjusted).
-")) +
-  ylab("Preventable Hospital Stays") +
+
+  xlab(desc[["v145_rawvalue"]]) +
+  ylab(desc[["v005_rawvalue"]])+
   theme(panel.background = element_rect(fill = "black"),
         plot.background = element_rect(fill = "black"),
         panel.grid.major = element_line(color = "white", size = 0.1),
@@ -99,7 +99,7 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v145_rawvalue))+
 We want to plot frequent mental distress raw value and PHS by Race
 ```{r}
 desc <- readRDS("../../../data/processed/colDesc_analysis2023.rds")
-for( var in v005_race_yaxis){
+for( var in v005_race_vars){
 v145byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = "v145_rawvalue"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
@@ -116,12 +116,11 @@ v145byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"),
 
 We want to plot Percentage of adults reporting fair or poor health  raw value and PHS raw value
 ```{r}
-query_x = "v002_rawvalue"
-for( var in v005_race_yaxis){
-v002byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = query_x))+
+for( var in v005_race_vars){
+v002byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = "(v002_rawvalue)"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab(desc[[query_x]]) +
+  xlab(desc[["v002_rawvalue"]]) +
   ylab(desc[[var]])+
   theme(panel.background = element_rect(fill = "black"),
            plot.background = element_rect(fill = "black"),
@@ -130,12 +129,13 @@ v002byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"),
            text = element_text(color = "white"))
   print(v002byraceVsPMHD)
 }
-
-ggplot(data_analytic, aes(y = v005_rawvalue, x = v002_rawvalue))+
+```
+```{r}
+ggplot(data_analytic, aes(y = log(v005_rawvalue), x = log(v002_rawvalue)))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab(paste("Percentage of adults reporting fair or poor health (age-adjusted)")) +
-  ylab("Preventable Hospital Stays") +
+   xlab(desc[["v002_rawvalue"]]) +
+  ylab(desc[["v005_rawvalue"]])+
   theme(panel.background = element_rect(fill = "black"),
         plot.background = element_rect(fill = "black"),
         panel.grid.major = element_line(color = "white", size = 0.1),
@@ -145,12 +145,12 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v002_rawvalue))+
 
 We want to plot Percentage of adults reporting fair or poor health raw value and PHS by Race
 ```{r}
-for( var in v005_race_yaxis){
-v002byraceVsPMHD <- ggplot(data_analytic, aes_string(y = var, x = "v002_rawvalue"))+
+for( var in v005_race_vars){
+v002byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = "(v002_rawvalue)"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab("Percentage of adults reporting fair or poor health (age-adjusted).") +
-  ylab(paste(v005_race_yaxis,":Preventable Hospital Stays"))+
+  xlab(desc[["v002_rawvalue"]]) +
+  ylab(desc[[var]])+
   theme(panel.background = element_rect(fill = "black"),
            plot.background = element_rect(fill = "black"),
            panel.grid.major = element_line(color = "white", size = 0.1),
@@ -165,11 +165,11 @@ We want to plot preventable hospital stay raw value and Drug Overdose raw value
 ```{r}
 #phs vs Drug overdase Raw
 #v138 Drug overdose: Number of drug poisoning deaths per 100,000 population.
-ggplot(data_analytic, aes(y = v005_rawvalue, x = v138_rawvalue))+
+ggplot(data_analytic, aes(y = log(v005_rawvalue), x = log(v138_rawvalue)))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab(paste("Number of drug poisoning deaths per 100,000 population.")) +
-  ylab("Preventable Hospital Stays") +
+    xlab(desc[["v138_rawvalue"]]) +
+  ylab(desc[["v005_rawvalue"]])+
   theme(panel.background = element_rect(fill = "black"),
         plot.background = element_rect(fill = "black"),
         panel.grid.major = element_line(color = "white", size = 0.1),
@@ -180,12 +180,12 @@ ggplot(data_analytic, aes(y = v005_rawvalue, x = v138_rawvalue))+
 We want to plot preventable hospital stay raw value and Drug Overdose by race
 ```{r}
 #phs vs Drug overdase by race
-for(var in v138_xaxis_vars){
-  va138byracegraph <- ggplot(data_analytic, aes_string(y = "v005_rawvalue", x = var))+
+for(var in v138_race_vars){
+  va138byracegraph <- ggplot(data_analytic, aes_string(y = "(v005_rawvalue)", x = paste0("log(",var,")")))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
-    xlab(paste(var, ":Number of drug poisoning deaths per 100,000 population.")) +
-    ylab("Preventable Hospital Stays")+
+  xlab(desc[[var]]) +
+  ylab(desc[["v005_rawvalue"]])+
     theme(panel.background = element_rect(fill = "black"),
           plot.background = element_rect(fill = "black"),
           panel.grid.major = element_line(color = "white", size = 0.1),
@@ -194,14 +194,15 @@ for(var in v138_xaxis_vars){
     print(va138byracegraph)
 }
 ```
+
 We want to plot preventable hospital stay by race and Drug Overdose raw value
 ```{r}
-for( var in v005_race_yaxis){
-v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = var, x = "v042_rawvalue"))+
+for( var in v005_race_vars){
+v005byraceVsPMHD <- ggplot(data_analytic, aes_string( y = paste0("log(",var,")"), x = "(v042_rawvalue)"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth()+
-  xlab("Average number of mentally unhealthy days reported in past 30 days (age-adjusted).") +
-  ylab(paste(var,":Preventable Hospital Stays"))+
+   xlab(desc[["v005_rawvalue"]]) +
+  ylab(desc[[var]])+
   theme(panel.background = element_rect(fill = "black"),
            plot.background = element_rect(fill = "black"),
            panel.grid.major = element_line(color = "white", size = 0.1),
@@ -212,7 +213,7 @@ v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = var, x = "v042_rawvalue
 ```
 We want to plot preventable hospital stay by race and Drug Overdose raw value log
 ```{r}
-for( var in v005_race_yaxis){
+for( var in v005_race_vars){
 v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"), x = "(v042_rawvalue)"))+
   geom_point(color="green", alpha =0.5)+
   geom_smooth() + 
@@ -226,60 +227,21 @@ v005byraceVsPMHD <- ggplot(data_analytic, aes_string(y = paste0("log(",var,")"),
   print(v005byraceVsPMHD)
 }
 ```
-
-We want to plot preventable hospital stay by race and income inequality raw value
 ```{r}
-for(i in 1:length(v044_race_xaxis)){
-  var_x <- v044_race_xaxis[i]
-  var_y <- v005_race_yaxis[i]
+for(i in 1:length(v063_race_vars)){
+  var_x <- v063_race_vars[i]
+  var_y <- v005_race_vars[i]
   
-  v044byracegraph <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
+  v063byracegraph <-ggplot(data_analytic, aes_string(y = var_y, x = var_x))+
     geom_point(color="green", alpha =0.5)+
     geom_smooth()+
-    xlab(paste(var_x, ":income inequality.")) +
-    ylab(paste(var_y, ":Preventable Hospital Stays"))+
+    xlab(desc[[var_x]]) +
+    ylab(desc[[var_y]])+
     theme(panel.background = element_rect(fill = "black"),
           plot.background = element_rect(fill = "black"),
           panel.grid.major = element_line(color = "white", size = 0.1),
           panel.grid.minor = element_line(color = "white", size = 0.05),
           text = element_text(color = "white")) 
-  print(v044byracegraph)
+  print(va138byracegraph)
 }
 ```
-
-We want to plot phs by race and median income by race
-```{r}
-for(i in 1:length(v063_race_xaxis)){
-  var_x <- v063_race_xaxis[i]
-  var_y <- v005_race_yaxis[i]
-  
-  v063byracegraph <-ggplot(data_analytic, aes_string(y = paste0("log(",var_y, ")"), x = paste0("log(",var_x,")")))+
-    geom_point(color="green", alpha =0.5)+
-    geom_smooth()+
-    xlab(paste(var_x, ":Median income.")) +
-    ylab(paste(var_y, ":Preventable Hospital Stays"))+
-    theme(panel.background = element_rect(fill = "black"),
-          plot.background = element_rect(fill = "black"),
-          panel.grid.major = element_line(color = "white", size = 0.1),
-          panel.grid.minor = element_line(color = "white", size = 0.05),
-          text = element_text(color = "white")) 
-  print(v063byracegraph)
-}
-```
-```{r}
-medianincomrace <- c("v063_race_asian","v063_race_white", "v063_race_aian", "v063_race_hispanic", "v063_race_black")
-  for(var in medianincomrace){
-  v063racegraph <- ggplot(data_analytic, aes_string(y = "v063_rawvalue", x = var))+
-    geom_point(color="green", alpha =0.5)+
-    geom_smooth()+
-    xlab(paste(var, ":median income by race.")) +
-    ylab("Median income raw")+
-    theme(panel.background = element_rect(fill = "black"),
-          plot.background = element_rect(fill = "black"),
-          panel.grid.major = element_line(color = "white", size = 0.1),
-          panel.grid.minor = element_line(color = "white", size = 0.05),
-          text = element_text(color = "white")) 
-    print(v063racegraph)
-}
-```
-
