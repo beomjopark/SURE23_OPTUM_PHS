@@ -52,7 +52,7 @@ elastic_net_spec <- linear_reg(
   mixture = tune()
 )
 
-elnet_grid <- grid_regular(penalty(c(0.1,2.0)), mixture(),  levels = 1000)
+elnet_grid <- grid_regular(penalty(c(0.1,2.0)), mixture(),  levels = 10)
 
 elnet_resample <- tune_grid(
   elastic_net_spec,
