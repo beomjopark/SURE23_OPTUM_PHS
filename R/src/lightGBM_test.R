@@ -165,3 +165,5 @@ p = sv_dependence(shp, v= "v070_rawvalue", alpha=0.2)
 p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
 p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
 p
+
+
