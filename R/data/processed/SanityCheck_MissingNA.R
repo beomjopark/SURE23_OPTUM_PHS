@@ -45,7 +45,7 @@ target_data = data_chrs23 %>% select(-one_of(target$Variable))
 
 check_na_target_data = target_data %>% aggr(., plot=FALSE)
 rownames(check_na_target_data$missings) = sub("_rawvalue", "", desc[check_na_target_data$missings$Variable])
-check_na_target_data$missings %>% 
+check_na_target_data$missings%>% 
   mutate(Rate = round(Count / nrow(target_data),2)) %>%
   arrange(desc(Count)) 
 

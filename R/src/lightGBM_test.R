@@ -122,7 +122,7 @@ train_mat = recipe_sat %>% prep() %>%
 shp = shapviz(model_fitted %>% extract_fit_engine(),
         X_pred = train_mat)
 
-p = sv_importance(shp, kind = "bar", max_display = 30)
+p = sv_importance(shp, kind = "bar", max_display = 5)
 p$data = 
   p$data %>%
   mutate(feature =
@@ -161,9 +161,19 @@ p$data %>%
            ) 
 p
 
-p = sv_dependence(shp, v= "v070_rawvalue", alpha=0.2) 
+p = sv_importance(shp, kind = "bar", max_display = 5)
+query_str = levels(p$data$feature)
+for(query in query_str) {
+  p = sv_dependence(shp, v= query, alpha=0.2) 
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+  plot(p)
+}
+ 
+p = sv_dependence(shp, v= "v054_rawvalue", alpha=0.2,color_var = NULL) 
 p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
 p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
-p
+plot(p)
+
 
 
