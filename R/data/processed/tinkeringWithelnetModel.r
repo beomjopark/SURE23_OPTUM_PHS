@@ -9,12 +9,11 @@ library(tidymodels) #used for models
 library(glmnet) #used for lasso
 library(recipes)
 
-
 # 1. Read Data
 model_data <- readRDS("../test/data/interim/target_data_.RDS")
 desc = readRDS("./data/processed/colDesc_analysis2023.rds")
 
-model_data %>%
+model_data = model_data %>%
   select(-ends_with("_flag"), -ends_with("cilow"), -ends_with("cihigh"),
          -ends_with("_numerator"), -ends_with("denominator"),
          - c("county_ranked", "statecode", "countycode", "fipscode")) %>%
@@ -38,10 +37,21 @@ rec2 <- recipe(v005_rawvalue ~ ., data = test_data) %>%
   step_impute_mode(all_nominal(), -all_outcomes()) %>%
   prep(data = test_data)
 
+# Calculate the mean of 'missing_column' excluding missing values
+mean_imputation_value <- mean(model_data$v058_numerator, na.rm = TRUE)
+# Impute missing values in 'missing_column' with the mean value
+model_data$v058_numerator_column_imputed <- ifelse(is.na(model_data$v058_numerator), mean_imputation_value, model_data$v058_numerator)
+# Display the updated data frame with the imputed column
+print(model_data)
+
+#now do that for all vars with missing data
+#check_na$missings %>% filter(Count > 0) : these need to be done for
+imputated_var <- c()
+for(var in imputated_var){}
+
 # Apply the preprocessing to training and testing data
 train_data <- bake(rec1, new_data = train_data)
 test_data <- bake(rec2, new_data = test_data)
-
 
 folds <- vfold_cv(train_data, v = 10)
 
@@ -63,6 +73,7 @@ elnet_resample <- tune_grid(
   elastic_net_spec,
   v005_rawvalue ~ .,
   resamples = folds,
-  grid = elnet_grid
+  grid = elnet_grid, 
+  control = control_grid(allow_par=TRUE, save_pred=TRUE, parallel_over = "resamples")
 )
 

@@ -41,7 +41,7 @@ recipe_sat =
   step_naomit(all_predictors()) %>%
   step_log(all_numeric_predictors(), offset=1) %>% 
   step_dummy(all_numeric_predictors(), one_hot=TRUE) %>% 
-
+  step_impute_mean()
 
 # 2.3 Define model engine
 engine_lasso = linear_reg(penalty = tune(), mixture = 1) %>%
