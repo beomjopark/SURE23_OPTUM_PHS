@@ -1,0 +1,34 @@
+---
+title: "ShinyApp"
+author: "Hugo Baca"
+date: "2023-07-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(shiny)
+library(rsconnect)
+```
+
+```{r}
+rsconnnect:: setAccountInfo(name='bdlp5f-hugo-baca',
+                          token='8E15EBFA411A95DC922A43F3122CBD34',
+                          secret='Wh7lRaJZV7eqScEk1U6gOWK9ibH0oAb04zk84Vyc')
+    rsconnect::deployApp('ShinyApp.Rmd')
+```
+
+```{r}
+
+ui <- fluidPage(
+  "Healthcare Optimization for Preventable Stays"
+) 
+
+server <- function(input, output, session) {
+}
+shinyApp(ui, server)
+
+```
