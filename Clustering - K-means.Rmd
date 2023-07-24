@@ -1,0 +1,178 @@
+---
+title: "Day 7 June 13 Notes"
+output: html_document
+date: "2023-06-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dslabs)
+gapminder <- as_tibble(gapminder)
+head(gapminder)
+```
+
+```{r}
+gapminder %>% ggplot(aes(x = gdp)) + geom_histogram()
+```
+
+```{r}
+clean_gapminder <- gapminder %>%
+  filter(year == 2011, !is.na(gdp)) %>%
+  mutate(log_gdp = log(gdp))
+clean_gapminder
+```
+```{r}
+init_kmeans <-
+  kmeans(dplyr::select(clean_gapminder,
+                      log_gdp, life_expectancy),
+          algorithm = "Lloyd"
+          , centers = 4,
+        nstart = 1)
+clean_gapminder %>%
+  mutate(country_clusters =
+    as.factor(init_kmeans$cluster)) %>%
+  ggplot(aes(x = log_gdp, y = life_expectancy,
+    color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom")
+```
+```{r}
+clean_gapminder %>%
+mutate(country_clusters =
+        as.factor(init_kmeans$cluster)) %>%
+  ggplot(aes(x = log_gdp, y = life_expectancy, 
+                color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom") +
+  coord_fixed()
+```
+
+```{r}
+clean_gapminder <- clean_gapminder %>%
+  mutate(s_log_gdp = as.numeric(scale(log_gdp,
+    center = TRUE, scale = TRUE)),
+    s_life_exp =
+    as.numeric(scale(life_expectancy,
+    center = TRUE, scale = TRUE)))
+  s_kmeans <- kmeans(dplyr::select(clean_gapminder,
+                      s_log_gdp, s_life_exp),
+    algorithm = "Lloyd",
+    , centers = 4,
+    nstart = 1)
+  clean_gapminder %>% mutate(country_clusters =
+    as.factor(s_kmeans$cluster)) %>%
+    ggplot(aes(x = log_gdp, y = life_expectancy,
+                color = country_clusters)) +
+    geom_point() +
+    ggthemes::scale_color_colorblind() +
+    theme(legend.position = "bottom") +
+    coord_fixed()
+```
+
+```{r}
+clean_gapminder %>%
+  mutate(country_clusters =
+        as.factor(s_kmeans$cluster)) %>%
+  ggplot(aes(x = s_log_gdp, y = s_life_exp,
+            color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom") +
+  coord_fixed()
+```
+
+```{r}
+another_kmeans <-
+  kmeans(dplyr::select(clean_gapminder,
+        s_log_gdp, s_life_exp),
+        algorithm = "Lloyd", 
+        centers = 4,
+        nstart = 1)
+clean_gapminder %>%
+  mutate(country_clusters =
+                as.factor(another_kmeans$cluster))
+  ggplot( aes(x = log_gdp, y = life_expectancy,
+              color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+nstart_kmeans <-
+  kmeans(dplyr::select(clean_gapminder,
+  s_log_gdp, s_life_exp),
+  algorithm = "Lloyd",
+  centers = 4,
+  nstart = 30)
+clean_gapminder %>%
+  mutate(country_clusters =
+    as.factor(nstart_kmeans$cluster))
+  ggplot(aes(x = log_gdp, y = life_expectancy,
+            color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom")
+```
+```{r}
+default_kmeans <-
+  kmeans(dplyr::select(clean_gapminder,
+          s_log_gdp, s_life_exp),
+      algorithm = "Hartigan-Wong",
+      centers = 4, nstart = 30)
+clean_gapminder %>%
+  mutate(country_clusters =
+        as.factor(default_kmeans$cluster))
+  ggplot(aes(x = log_gdp, y = life_expectancy,
+        color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom")
+```
+```{r}
+library(flexclust)
+init_kmeanspp <-
+  kcca(dplyr::select(clean_gapminder,
+    s_log_gdp, s_life_exp),
+    k = 4,
+  control = list(initcent = "kmeanspp"))
+clean_gapminder %>%
+  mutate(country_clusters =
+    as.factor(init_kmeanspp@cluster))
+  ggplot(aes(x = log_gdp, y = life_expectancy,
+    color = country_clusters)) +
+  geom_point() +
+  ggthemes::scale_color_colorblind() +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+# Initialize number of clusters to search over
+n_clusters_search <- 2:12
+tibble(total_wss =
+  # Compute total WSS for each number by looping with sapply
+    sapply(n_clusters_search,
+      function(k_choice) {
+                        kmeans_results <- kcca(dplyr::select(clean_gapminder,
+                            s_log_gdp,
+                            s_life_exp),
+                            k = k_choice,
+                            control = list(initcent = "kmeanspp"))
+        # Return the total WSS for choice of k
+        return(sum(kmeans_results@clusinfo$size *
+        kmeans_results@clusinfo$av_dist))
+        })) %>%
+mutate(k = n_clusters_search) %>%
+ggplot(aes(x = k, y = total_wss)) +
+geom_line() + geom_point() +
+labs(x = "Number of clusters K"
+, y = "Total WSS") +
+theme_bw()
+```
+
