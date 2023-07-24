@@ -43,7 +43,7 @@ Results:
 library(readr)
 library(ggplot2)
 library(dplyr)
-
+library(readr)
 #SCATTERPLOT
 data = read_csv("data/raw/analytic_data2023_0.csv", skip = 1)
 
@@ -72,9 +72,119 @@ ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(al
 #all 50 for white
 ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
 
+for (unemployment in races) {
+  unemployment_plot <- ggplot(data_all, aes(log(x = v023_rawvalue), y = log(get(paste0("v005_race_", unemployment))))) +
+    geom_point(alpha = 0.5, color = "orange") +
+    ggtitle(paste("Unemployment vs PHS for", unemployment))+xlab("Unemployment Rate")+
+    labs(y = paste("PHS for", unemployment)) + xlim(4, 9) +ylim(4.5,11) +geom_smooth()+geom_smooth(method = "lm", color = "red")
+  print(unemployment_plot)
+}
 
 
 ```
+
+
+Creating Facet Wrapped Graphs
+```{r}
+#example
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(boot)
+
+data_all = data %>%  select(4,5,153:162, 193:197, 183:187, 218:222, 563:583)
+
+data_long <- data_all %>% 
+  pivot_longer(cols = starts_with('v005_race'), names_to = "race", values_to = "value") %>% 
+  pivot_longer(cols = starts_with('v161_race'), names_to = "race_suicide", values_to = "value_suicide") 
+  
+  
+
+p <- ggplot(data_long, aes(x = inv.logit(v023_rawvalue), y = log(value), color = race)) +
+  geom_point(alpha = 0.3) +
+  labs(x = descriptions[["v023_rawvalue"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth() +
+  coord_fixed(ratio = 0.01)
+#ratio greater than 1 = longer y and inverse is true of X
+
+  print(p)
+p
+  
+p + facet_grid(.~race)
+p + facet_wrap(race~.)
+
+```
+```{r}
+
+#suicides graph 
+
+#WIP fix color by argumment, using  race_suicides includes the CI columns when transforming it 
+s <- ggplot(data_long, aes(x = inv.logit(v161_rawvalue), y = log(value_suicide), color = race)) +
+  geom_point(alpha = 0.3) +
+  labs(x = descriptions[["v161_rawvalue (Suicide)"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth() +
+  coord_fixed(ratio = 0.001)
+#ratio greater than 1 = longer y and inverse is true of X
+
+  print(s)
+s
+  
+s + facet_grid(.~race)
+s + facet_grid(race~.)
+s + facet_wrap(race~.)
+```
+```{r}
+#plotting by race
+
+s <- ggplot(data_all, aes(x = v044_rawvalue, y = log(value))) +
+  geom_point(alpha = 0.3) +
+  labs(x = descriptions[["v044 (income inequality)"]], y = "Preventable Hospital Stays") +
+  scale_color_discrete(labels = c("AIAN", "Asian", "Black", "Hispanic", "White")) +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.background = element_rect(fill = "black"),
+    legend.text = element_text(color = "white")
+  ) +
+  geom_smooth() +
+  coord_fixed(ratio = 0.001)
+#ratio greater than 1 = longer y and inverse is true of X
+
+  print(s)
+s
+  
+s + facet_grid(.~race)
+s + facet_wrap(race~.)
+
+
+#take PCP var and put into grid, use mental health, poor mental health days, 
+
+
+#find best scatterplot
+#then have the graphs in the report and the poster
+
+```
+
 
 
 
@@ -129,9 +239,9 @@ mutate(state = state2abbr(region)) %>%
 select(-subregion)
 head(state_borders)
 
-bi_chloro = access_care %>%
-filter(!is.na(v004_other_data_1) & !is.na(v062_other_data_1) & state != "US")  %>% 
-group_by(state) 
+bi_chloro = access_care %>% mutate(v004_other_data_1 = 1/ v004_other_data_1) %>%
+filter(!is.na(v143_rawvalue) & !is.na(v062_other_data_1) & state != "US")  %>%
+group_by(state)
 
 #join
 bi_chloro_plot <- state_borders %>%
@@ -145,16 +255,13 @@ library(biscale)
 library(tidycensus)
 library(sf)
 library(tidyr)
-county_geospatial_df =
-  tidycensus::get_acs(geography = "county",
-                      variables = "B19013_001",
-                      geometry = TRUE, year = 2021) %>%
-  select(-variable, -moe, -estimate) %>%
-  separate(col = 'NAME', into = c('county', 'state'), sep = ',') %>%
-  mutate(state = usdata::state2abbr(state)) %>%
-  tigris::shift_geometry()
+saveRDS(county_geospatial_df, "./data/external/county_acs.rds")
+# Load acs data
+county_geospatial_df = readRDS("./data/external/county_acs.rds")	county_geospatial_df = readRDS("./data/external/county_acs.rds")
   
-data_bi1 = bi_class(bi_chloro_plot, x = v005_rawvalue, y = v004_other_data_1, style = "quantile", dim = 3)
+#create the trichotimized pedigree and assign each obs a value
+#
+
 
 #CHECK THS CODE
 data_bi1 =  data_bi1 %>% 
@@ -168,18 +275,8 @@ data_bi1 =  data_bi1 %>%
 county_bivar = merge(data_bi1, county_geospatial_df, by = c("state", "county"))
 county_bivar = unique(county_bivar)
 
-#county_bivar = county_bivar %>% select(-long) %>% 
-#select(-lat)
-
-#county_bivar %>% relocate("geometry", .after = "county")
-
-
-#data_bi1 <- data_bi1 %>%
-  #st_as_sf(coords = "geometry", crs = 4326)
-
-
 map <- ggplot() +
-  geom_sf(data = county_bivar, mapping = aes(fill = biVar, geometry = geometry), color = "black", size = 0.1, show.legend = FALSE) +
+  geom_sf(data = county_bivar, mapping = aes(fill = biVar, geometry = geometry), color = "light grey", size = 0.1, show.legend = FALSE) +
   bi_scale_fill(pal = "GrPink", dim = 3) +
   labs(
   title = "PCP vs PHS Across US",) +
@@ -187,8 +284,8 @@ map <- ggplot() +
 
 legend <- bi_legend(pal = "GrPink",
                     dim = 3,
-                    xlab = "Higher % PCP",
-                    ylab = "Higher % Mental Health",
+                    xlab = "Higher PHS",
+                    ylab = "PCP Providers",
                     size = 5)
 
 finalPlotCow = cowplot::plot_grid(map, legend, ncol = 2, rel_widths = c(0.8, 0.2))

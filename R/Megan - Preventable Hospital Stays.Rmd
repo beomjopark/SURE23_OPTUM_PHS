@@ -164,22 +164,22 @@ View(find30k)
 
 
 #all 50 for asian
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_asian )) + geom_point(alpha = 0.2, color = "orange") + ggtitle("unemployment vs preventable stays for asians") +geom_smooth() + xlim(0, 0.15) + ylim(0, 30000)
 
 
 
 #all 50 for black
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_black )) + geom_point(alpha = 0.8, color = "blue" )+ ggtitle("unemployment vs preventable stays for blacks")+geom_smooth() + xlim(0, 0.20) + ylim(0, 30000)
 
 
 
 #all 50 for hispanic
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_hispanic )) + geom_point(alpha = 0.8, color = "pink" )+ ggtitle("unemployment vs preventable stays for hispanics")+geom_smooth() + xlim(0, 0.20) + ylim(0, 30000)
 
 
 
 #all 50 for white
-ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth() + xlim(0, 0.25) + ylim(0, 30000)
+ggplot(data_all,aes(x = v023_rawvalue, y = v005_race_white )) + geom_point(alpha = 0.2, color = "green" ) +  ggtitle("unemployment vs preventable stays for whites")+geom_smooth() + xlim(0, 0.20) + ylim(0, 30000)
 
 
 View(data_all)

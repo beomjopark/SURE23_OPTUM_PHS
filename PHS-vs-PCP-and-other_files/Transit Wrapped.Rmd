@@ -1,0 +1,20 @@
+---
+title: "TransitVars Wrapped"
+output: html_document
+date: "2023-07-22"
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(dplyr)
+
+data = read_csv("../data/raw/analytic_data2023_0.csv", skip = 1)
+```
+
+
+```{r}
+
+```
+

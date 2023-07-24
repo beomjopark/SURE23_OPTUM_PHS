@@ -1,0 +1,24 @@
+---
+title: "Untitled"
+output: ''
+date: "2023-07-24"
+---
+
+#hs completion rate
+
+```{r}
+
+```
+
+
+#income inequality
+```{r}
+
+```
+
+
+#unemployment rate
+```{r}
+
+```
+
