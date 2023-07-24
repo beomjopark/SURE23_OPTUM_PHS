@@ -118,7 +118,6 @@ autoplot(tuned_model)
 
 collect_metrics(tuned_model) %>% filter(.metric == "mae")
 
-
 model_fitted_boosting = workflow_boosting %>% 
   finalize_workflow(select_best(tuned_model, metric="rmse")) %>%
   fit(train_data)
@@ -219,9 +218,46 @@ for(query in query_str) {
   plot(p)
 }
 
-p = sv_dependence(shp, v= "v054_rawvalue", alpha=0.2,color_var = NULL) 
-p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
-p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+p = sv_dependence(shp, v = "v054_rawvalue", alpha = 0.2, color_var = NULL) 
+# Check if the labels are not null before modifying them
+if (!is.null(p$labels$x)) {
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+}
+if (!is.null(p$labels$colour)) {
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+}
+plot(p)
+
+
+p = sv_dependence(shp, v = "v143_rawvalue", alpha = 0.2, color_var = NULL) 
+# Check if the labels are not null before modifying them
+if (!is.null(p$labels$x)) {
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+}
+if (!is.null(p$labels$colour)) {
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+}
+plot(p)
+
+
+p = sv_dependence(shp, v = "v137_rawvalue", alpha = 0.2, color_var = NULL) 
+# Check if the labels are not null before modifying them
+if (!is.null(p$labels$x)) {
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+}
+if (!is.null(p$labels$colour)) {
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+}
+plot(p)
+
+p = sv_dependence(shp, v = "v067_rawvalue", alpha = 0.2, color_var = NULL) 
+# Check if the labels are not null before modifying them
+if (!is.null(p$labels$x)) {
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+}
+if (!is.null(p$labels$colour)) {
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+}
 plot(p)
 
 
