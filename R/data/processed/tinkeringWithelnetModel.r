@@ -162,3 +162,67 @@ p
 
 
 
+####
+
+## EXAMINE SHAP
+library(shapviz)
+train_mat = recipe_sat %>% prep() %>%
+  bake(has_role("predictor"), new_data=test_data, composition = "matrix")
+shp = shapviz(model_fitted %>% extract_fit_engine(),
+              X_pred = train_mat)
+
+p = sv_importance(shp, kind = "bar", max_display = 5)
+p$data = 
+  p$data %>%
+  mutate(feature =
+           fct_recode(feature,
+                      !!!setNames(levels(p$data$feature),
+                                  sub(" raw value", "", desc[levels(p$data$feature)] %>% unlist)))) 
+p
+
+p = sv_force(shp, row_id = 119, max_display = 8)
+new_label = sapply(regmatches(p$data$label, regexpr("^[^=]+", p$data$label)),
+                   function(x) ifelse(is.null(desc[[x]]), x,
+                                      sub(" raw value", "", desc[[x]])))
+p$data$label =
+  mapply(function(x, y) gsub("^[^=]+", x, y), new_label, p$data$label)
+p
+
+p = sv_waterfall(shp, row_id = 119, max_display = 20)
+new_label = sapply(regmatches(p$data$label, regexpr("^[^= ]+", p$data$label)),
+                   function(x) ifelse(is.null(desc[[x]]), x,
+                                      sub(" raw value", "", desc[[x]])))
+p$data$label =
+  mapply(function(x, y) gsub("^[^=]+", x, y), new_label, p$data$label)
+p
+
+p = sv_importance(shp, kind="beeswarm", alpha=0.3)
+p$data = 
+  p$data %>%
+  mutate(Var2 =
+           fct_recode(Var2,
+                      !!!setNames(levels(p$data$Var2),
+                                  sub(" raw value", "", desc[levels(p$data$Var2)] %>% unlist))),
+         feature =
+           fct_recode(feature,
+                      !!!setNames(levels(p$data$feature),
+                                  sub(" raw value", "", desc[levels(p$data$feature)] %>% unlist)))
+  ) 
+p
+
+p = sv_importance(shp, kind = "bar", max_display = 5)
+query_str = levels(p$data$feature)
+for(query in query_str) {
+  p = sv_dependence(shp, v= query, alpha=0.2) 
+  p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+  p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+  plot(p)
+}
+
+p = sv_dependence(shp, v= "v054_rawvalue", alpha=0.2,color_var = NULL) 
+p$labels$x = sub(" raw value", "", desc[[p$labels$x]])
+p$labels$colour = sub(" raw value", "", desc[[p$labels$colour]])
+plot(p)
+
+
+
