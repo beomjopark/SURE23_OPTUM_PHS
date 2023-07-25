@@ -18,7 +18,7 @@ data_core = data_chrs23 %>%
   filter(state != "US") 
 
 # check all vars in data
-check_na = data_chrs23 %>% aggr(., plot=FALSE)
+check_na = data_core %>% aggr(., plot=FALSE)
 rownames(check_na$missings) = sub("_rawvalue", "", desc[check_na$missings$Variable])
 
 
@@ -29,12 +29,12 @@ check_na$missings %>% count()
 
 
 target <- check_na$missings %>% 
-  mutate(Rate = round(Count / nrow(data_chrs23),2)) %>%
+  mutate(Rate = Count / nrow(data_chrs23)) %>%
   arrange(desc(Count)) %>% filter(Rate >= 0.70)
 target %>% count()
 
 nontarget <- check_na$missings %>% 
-  mutate(Rate = round(Count / nrow(data_chrs23),2)) %>%
+  mutate(Rate = Count / nrow(data_chrs23)) %>%
   arrange(desc(Count)) %>% filter(Rate < 0.70)
 nontarget %>% count()
 

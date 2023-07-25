@@ -32,7 +32,7 @@ library(lightgbm)
 target_name = "v005_rawvalue"
 recipe_sat = 
   recipe(v005_rawvalue ~ ., data=data_raw_only) %>%
-  step_log(all_numeric_predictors(), offset=1) %>%
+#  step_log(all_numeric_predictors(), offset=1) %>%
   step_dummy(all_nominal_predictors(), one_hot=TRUE)
 
 set.seed(1)
