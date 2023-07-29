@@ -4,13 +4,14 @@
 
 - Megan Le<sup>\*</sup> (University of Virginia), Andrea Renderos<sup>\*</sup> (CSU San Bernardino), Hugo Baca (CSU San Bernardino)
 
-\* Equal Contributions
+	\* Equal Contributions
 
 - TA Advisor: Beomjo Park (Carnegie Mellon University)
 
 - June 1 -- July 29 
 
-- Poster: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/poster.pdf
+- Deliverables
+	Poster: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/poster.pdf
 
-Report: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/report.html
+	Report: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/report.html
 
