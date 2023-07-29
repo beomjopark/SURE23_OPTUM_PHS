@@ -1,31 +1,16 @@
-# Carnegie Mellon University Research
+# CMU-Optum Summer Research Experience 2023
 
-## HOSP = Hospital Outpatient Stay Prevention, Healthcare Optimization for Preventable Stays
+## Analyzing the Impact of Sleep and Distress on Preventable Hospitalizations Across Racial and Ethnic Groups 
 
-Who: Hugo Baca, Megan, Andrea, Advisor Beonjo 
+- Megan Le<sup>\*</sup> (University of Virginia), Andrea Renderos<sup>\*</sup> (CSU San Bernardino), Hugo Baca (CSU San Bernardino)
 
-What: Optum & United Healthcare Group Research on Preventable Hospital Stays: Do income inequality, unemployment and high school completion rates affect the number of preventable hospital stays of certain racial groups at the county level?
+\* Equal Contributions
 
-Where: Carnegie Mellon University 
+- TA Advisor: Beomjo Park (Carnegie Mellon University)
 
-When: June 1 - July 29 
+- June 1 -- July 29 
 
-Why: Because Research that's why 
+- Poster: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/poster.pdf
 
-jk, because we have the potential to make a real impact and improve the healthcare systems which will lead to better care for patients. 
+Report: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/report.html
 
-How: not sure yet 
-
-Data Sources: https://www.countyhealthrankings.org/explore-health-rankings/rankings-data-documentation
-
-Technologies: Rstudio, tidyverse, dplyr, ...
-
-Desgin doc: https://docs.google.com/document/d/1BUZk0nItlUApkebYZxDXz6MqiVx2eeo00B0QYv6eW1U/edit?usp=sharing
-
-Contact:
-
-Hugo Baca
-
-[Email](hugo123baca@gmail)
-
-[LinkedIn]( www.linkedin.com/in/hugobaca)
