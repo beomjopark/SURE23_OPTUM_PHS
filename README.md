@@ -11,7 +11,8 @@
 - June 1 -- July 29 
 
 - Deliverables
-	Poster: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/poster.pdf
 
-	Report: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/report.html
+	* Poster: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/poster.pdf
+
+	* Report: https://www.stat.cmu.edu/cmsac/sure/2023/showcase/preventable_hospital_stays/report.html
 
